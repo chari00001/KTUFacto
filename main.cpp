@@ -1,88 +1,130 @@
 #include <iostream>
 #include <string>
 #include <time.h>
-#include <curses.h>
+// #include <conio.h> // for Windows
+#include <curses.h> // For Linux
 #include <regex>
 #include <fstream>
+#include <list>
 
 using namespace std;
 
-class Menu
+class SinglyNode
 {
 public:
-    void MenuBaslat()
+    string elem;
+    SinglyNode *next;
+};
+
+class SinglyLinkedList
+{
+public:
+    SinglyNode *head;
+
+    SinglyLinkedList();
+
+    bool empty() const;
+    void addBack(const string &e);
+    void print();
+
+    void removeOrdered(const string &e);
+};
+
+SinglyLinkedList::SinglyLinkedList()
+{
+    head = NULL;
+}
+
+bool SinglyLinkedList::empty() const
+{
+    return head == NULL;
+}
+
+void SinglyLinkedList::addBack(const string &e)
+{
+    SinglyNode *v = new SinglyNode;
+    // If data already exists in the list, don't add it again
+    for (SinglyNode *i = head; i != NULL; i = i->next)
     {
-        int opsiyon1, opsiyon2;
-        cout << "1 - Sisteme giris\n2 - Uye kaydi\n3 - Cikis"
-             << endl;
-        cin >> opsiyon1;
-        system("clear"); // system("cls") - windows
-    IF:
-        if (opsiyon1 == 1)
+        if (i->elem == e)
         {
-            cout << "1 - Yönetici girişi\n2 - Müşteri giris\n"
-                 << endl;
-            cin >> opsiyon2;
-            system("clear");
-            if (opsiyon2 == 1)
-            {
-                YoneticiGiris();
-            }
-            else if (opsiyon2 == 2)
-            {
-                MusteriGiris();
-            }
-            else
-            {
-                cout << "Yanlis Secim." << endl;
-                goto IF;
-            }
+            return;
         }
-        else if (opsiyon1 == 2)
-        {
-            cout << "patates";
-        }
+        v->elem = e;
+        v->next = NULL;
     }
 
-    void YoneticiGiris()
+    if (head == NULL)
+        head = v;
+    else
     {
-    YONETICI_MENU:
-        cout << "1 - Urun ekle\n2 - Kurye ekle\n3 - Sikayet ve Oneriler\n4 - Indirim kodu tanimla\n5 - Siparis Faturalari" << endl;
-        int ops;
+        SinglyNode *first = head;
+        while (first->next != NULL)
+            first = first->next;
+        first->next = v;
+    }
+}
 
-        cin >> ops;
-
-        if (ops == 1)
-        {
-            cout << "Urun ekle";
-        }
-        else if (ops == 2)
-        {
-            cout << "Kurye ekle";
-        }
-        else if (ops == 3)
-        {
-            cout << "Sikayet ve Oneriler";
-        }
-        else if (ops == 4)
-        {
-            cout << "Indirim kodu tanimla";
-        }
-        else if (ops == 5)
-        {
-            cout << "Faturalar";
-        }
-        else
-        {
-            cout << "Hatali giris" << endl;
-            goto YONETICI_MENU;
-        }
+void SinglyLinkedList::removeOrdered(const string &e)
+{
+    if (empty())
+    {
+        cout << "List is empty !" << endl;
+        return;
     }
 
-    void MusteriGiris()
+    if ((e.compare(head->elem) == 0))
     {
-        cout << "1 - Kategoriler\n2 - Siparis Takip\n3 - Sikayet ve Oneriler\n4 - Sifre Degistir\n5 - Geri dön" << endl;
+        SinglyNode *temp = head;
+        head = head->next;
+        delete temp;
+        return;
     }
+
+    SinglyNode *previous = head;
+    while (previous->next != NULL)
+    {
+        if ((e.compare(previous->next->elem) == 0))
+        {
+            SinglyNode *temp = previous->next;
+            previous->next = previous->next->next;
+            delete temp; // previous->next 'i silinir
+            return;
+        }
+
+        previous = previous->next;
+    }
+
+    if (previous->next == NULL)
+        cout << "\n"
+             << e << " is not found" << endl;
+}
+
+void SinglyLinkedList::print()
+{
+    if (empty())
+    {
+        cout << "List is empty !" << endl;
+        return;
+    }
+
+    SinglyNode *first = head;
+    while (first != NULL)
+    {
+        cout << first->elem << endl;
+        first = first->next;
+    }
+}
+
+class Hatalar
+{
+public:
+    void sifreUzunluguUyari() { cout << "Sifre 8 Karakterden Az 24 Karakterden Fazla Olamaz!!" << endl; }
+    void buyukHarfUyari() { cout << "Kullanici Adi Buyuk Harf Iceremez!!!" << endl; }
+    void gucluSifreUyari() { cout << "Lutfen Daha Guclu Bir Sifre Giriniz!!!" << endl; }
+    void kullaniciTurkceKarakterUyari() { cout << "Kullanici Adi Turkce Karakter veya Bosluk Iceremez!!" << endl; }
+    void sifreturkceKarakterUyari() { cout << "Sifre Turkce Karakter veya Bosluk Iceremez!!!" << endl; }
+    void k_adiUzunluguUyari() { cout << "Kullanici Adi 8 Karakterden Az 24 Karakterden Fazla Olamaz" << endl; }
 };
 
 class Kisi
@@ -110,6 +152,11 @@ private:
     string dTarihi;
 
 public:
+    Kullanici(string KullaniciAdi = "")
+    {
+        kullaniciAdi = KullaniciAdi;
+    }
+
     void setKullaniciAdi(string kullaniciAdi) { this->kullaniciAdi = kullaniciAdi; }
     void setEposta(string ePosta) { this->ePosta = ePosta; }
     void setAdres(string adres) { this->adres = adres; }
@@ -124,46 +171,61 @@ public:
     string getIndirimKodu() { return indirimKodu; }
     string getDTarihi() { return dTarihi; }
 
-    string sifrele(const char *yazi, bool goster)
+    void SikayetYaz()
     {
-        const char BACKSPACE = 8;
-        const char RETURN = 13;
+        string sikayet;
 
-        string sifre;
-        unsigned char harf = 0;
+        cout << "Sikayet veya Onerinizi yaziniz: " << endl;
+        getline(cin >> ws, sikayet);
 
-        cout << yazi;
+        ofstream SikayetFile("./sikayetler.txt", ios::app);
 
-        while (harf = getch() != RETURN)
+        if (SikayetFile.is_open())
         {
-            if (harf == BACKSPACE)
-            {
-                if (sifre.length() != 0)
-                {
-                    if (goster)
-                        cout << "\b \b";
-                    sifre.resize(sifre.length() - 1);
-                }
-            }
-            else if (harf == 0 || harf == 224) // handle escape sequences
-            {
-                getch(); // ignore non printable chars
-                continue;
-            }
-            else
-            {
-                sifre += harf;
-                if (goster)
-                    cout << '*';
-            }
+            SikayetFile << getKullaniciAdi() << " - " << sikayet << endl;
         }
-        cout << endl;
-        return sifre;
     }
+
+    /*   string sifrele(const char *yazi, bool goster)
+       {
+           const char BACKSPACE = 8;
+           const char RETURN = 13;
+
+           string sifre;
+           unsigned char harf = 0;
+
+           cout << yazi;
+
+           while (harf = _getch() != RETURN)
+           {
+               if (harf == BACKSPACE)
+               {
+                   if (sifre.length() != 0)
+                   {
+                       if (goster)
+                           cout << "\b \b";
+                       sifre.resize(sifre.length() - 1);
+                   }
+               }
+               else if (harf == 0 || harf == 224) // handle escape sequences
+               {
+                   _getch(); // ignore non printable chars
+                   continue;
+               }
+               else
+               {
+                   sifre += harf;
+                   if (goster)
+                       cout << '*';
+               }
+           }
+           cout << endl;
+           return sifre;
+       }*/
 
     void kaydet()
     {
-        ofstream kullanicilar("./kullanicilar.txt", ios::app);
+        fstream kullanicilar("./kullanicilar.txt", ios::app);
 
         string kullaniciAdi;
         string sifre;
@@ -176,24 +238,41 @@ public:
             cout << "Kullanici Adi:	";
             getline(cin >> ws, kullaniciAdi);
 
-            sifre = sifrele("Sifre:	", true);
+            // sifre = sifrele("Sifre:	", true);
+            cout << "\nŞifreniz: ";
+            getline(cin >> ws, sifre);
 
-            cout << "Epostanizi Giriniz: ";
+            cout << "\nEpostanizi Giriniz: ";
             getline(cin >> ws, ePosta);
 
             if (kullaniciAdiKontrol(kullaniciAdi))
             {
                 setKullaniciAdi(kullaniciAdi);
             }
+            else
+            {
+                cout << "Kullanıcı adı geçersiz.\n";
+                goto KONTROL;
+            }
 
             if (sifreKontrol(sifre))
             {
                 setSifre(sifre);
             }
+            else
+            {
+                cout << "Şifre geçersiz.\n";
+                goto KONTROL;
+            }
 
             if (ePostaKontrol(ePosta))
             {
                 setEposta(ePosta);
+            }
+            else
+            {
+                cout << "Eposta geçersiz.\n";
+                goto KONTROL;
             }
 
             kullanicilar << getKullaniciAdi() << " " << getSifre() << " " << getEposta() << endl;
@@ -202,7 +281,7 @@ public:
         }
         else
         {
-            cout << "Boyle Bir Dosya Yok....." << endl;
+            cout << "Böyle Bir Dosya Yok..." << endl;
         }
     }
 
@@ -262,7 +341,7 @@ public:
         } while (!kontrol);
     }
     bool kullaniciAdiKontrol(string kullanici_adi)
-    { //!!!!!!!!!!!!!!!  DUZELT�LECEK KISIM  !!!!!!!!!!!!!!!//
+    { //!!!!!!!!!!!!!!!  DUZELTILECEK KISIM  !!!!!!!!!!!!!!!//
         Hatalar hata;
         regex kullanici_ad_exp{"^[a-z_0-9]+$"};
 
@@ -303,11 +382,83 @@ public:
 class Yonetici : public Kisi
 {
 private:
-    char *sifre;
+    string sifre;
 
 public:
+    Yonetici(string Sifre = "")
+    {
+        sifre = Sifre;
+    }
     void set_sifre(char *) { this->sifre = sifre; }
     string get_sifre() { return sifre; }
+
+    void UrunEkle()
+    {
+        ofstream UrunlerFile("./urunler.txt", ios::app);
+
+        string cat, name, price, size, color;
+        cout << "Urunun Kategorisini giriniz: " << endl;
+        cin >> cat;
+        cout << "Urunun Ismini giriniz: " << endl;
+        cin >> name;
+        cout << "Urunun Fiyatini giriniz: " << endl;
+        cin >> price;
+        cout << "Urunun Boyutunu giriniz: " << endl;
+        cin >> size;
+        cout << "Urunun Rengini giriniz: " << endl;
+        cin >> color;
+
+        if (UrunlerFile.is_open())
+        {
+            UrunlerFile << cat << " " << name << " " << price << " " << size << " " << color << endl;
+        }
+        else
+        {
+            cout << "Boyle bir dosya yok." << endl;
+        }
+        UrunlerFile.close();
+    }
+    void KuryeEkle();
+    void SikayetOku()
+    {
+        ifstream sikayetFile("./sikayetler.txt");
+        string line;
+        if (sikayetFile.is_open())
+        {
+            while (getline(sikayetFile, line))
+            {
+                cout << line << endl;
+            }
+        }
+        else
+        {
+            cout << "Boyle bir dosya yok." << endl;
+        }
+        sikayetFile.close();
+    }
+    void IndirimKoduEkle()
+    {
+        ofstream IndirimlerFile("./indirimler.txt", ios::app);
+        string kod;
+        int indirim;
+
+        cout << "Indirim kodunu giriniz: " << endl;
+        cin >> kod;
+
+        cout << "Indirim miktarini giriniz: " << endl;
+        cin >> indirim;
+
+        if (IndirimlerFile.is_open())
+        {
+            IndirimlerFile << kod << " " << indirim << endl;
+        }
+        else
+        {
+            cout << "Boyle bir dosya bulunamadi." << endl;
+        }
+        IndirimlerFile.close();
+    }
+    void FaturaOku();
 };
 
 class Kurye : public Kisi
@@ -320,10 +471,27 @@ class Kiyafet
 {
 private:
     double fiyat;
-    char *kategori;
-    char *kiyafet_adi;
-    char *boyut;
-    char *renk;
+    string kategori;
+    string kiyafet_adi;
+    string boyut;
+    string renk;
+
+public:
+    // make set and get functions for private variables
+    void set_fiyat(double fiyat) { this->fiyat = fiyat; }
+    double get_fiyat() { return fiyat; }
+
+    void set_kategori(string kategori) { this->kategori = kategori; }
+    string get_kategori() { return kategori; }
+
+    void set_kiyafet_adi(string kiyafet_adi) { this->kiyafet_adi = kiyafet_adi; }
+    string get_kiyafet_adi() { return kiyafet_adi; }
+
+    void set_boyut(string boyut) { this->boyut = boyut; }
+    string get_boyut() { return boyut; }
+
+    void set_renk(string renk) { this->renk = renk; }
+    string get_renk() { return renk; }
 };
 
 class Siparis : public Kiyafet
@@ -335,22 +503,209 @@ private:
     int siparis_ulasim;    // TIME
 };
 
-class Hatalar
-{
-public:
-    void sifreUzunluguUyari() { cout << "Sifre 8 Karakterden Az 24 Karakterden Fazla Olamaz!!" << endl; }
-    void buyukHarfUyari() { cout << "Kullanici Adi Buyuk Harf Iceremez!!!" << endl; }
-    void gucluSifreUyari() { cout << "Lutfen Daha Guclu Bir Sifre Giriniz!!!" << endl; }
-    void kullaniciTurkceKarakterUyari() { cout << "Kullanici Adi Turkce Karakter veya Bosluk Iceremez!!" << endl; }
-    void sifreturkceKarakterUyari() { cout << "Sifre Turkce Karakter veya Bosluk Iceremez!!!" << endl; }
-    void k_adiUzunluguUyari() { cout << "Kullanici Adi 8 Karakterden Az 24 Karakterden Fazla Olamaz" << endl; }
-};
-
 class Zaman
 {
 private:
     int saat;
     int dakika;
+};
+
+class Menu
+{
+public:
+    void MenuBaslat()
+    {
+        int opsiyon1, opsiyon2;
+        cout << "1 - Sisteme giris\n2 - Uye kaydi\n3 - Cikis"
+             << endl;
+        cin >> opsiyon1;
+        system("clear"); // system("cls") - windows
+    IF:
+        if (opsiyon1 == 1)
+        {
+            cout << "1 - Yönetici girişi\n2 - Müşteri girişi\n"
+                 << endl;
+            cin >> opsiyon2;
+            system("clear");
+            if (opsiyon2 == 1)
+            {
+                YoneticiGiris();
+            }
+            else if (opsiyon2 == 2)
+            {
+                MusteriGiris();
+            }
+            else
+            {
+                cout << "Yanlış Seçim." << endl;
+                goto IF;
+            }
+        }
+        else if (opsiyon1 == 2)
+        {
+            Kullanici user;
+            user.kaydet();
+        }
+    }
+
+    void YoneticiGiris()
+    {
+        Yonetici y;
+
+        string sifre, girilenSifre;
+        ifstream AdminFile("./yonetici.txt", ios::out);
+        AdminFile >> sifre;
+
+        cout << "Admin sifrenizi giriniz:" << endl;
+        cin >> girilenSifre;
+        if (sifre == girilenSifre)
+        {
+        YONETICI_MENU:
+            cout << "1 - Urun ekle\n2 - Kurye ekle\n3 - Sikayet ve Oneriler\n4 - Indirim kodu tanimla\n5 - Siparis Faturalari" << endl;
+            int ops;
+
+            cin >> ops;
+
+            if (ops == 1)
+            {
+                y.UrunEkle();
+            }
+            else if (ops == 2)
+            {
+                cout << "Kurye ekle";
+            }
+            else if (ops == 3)
+            {
+                y.SikayetOku();
+            }
+            else if (ops == 4)
+            {
+                y.IndirimKoduEkle();
+            }
+            else if (ops == 5)
+            {
+                cout << "Faturalar";
+            }
+            else
+            {
+                cout << "Hatali giris" << endl;
+                goto YONETICI_MENU;
+            }
+        }
+        else
+        {
+            cout << "Yanlış şifre.";
+        }
+        AdminFile.close();
+    }
+
+    void MusteriGiris()
+    {
+        // Get the username and password from the user and check if there is a match in the database
+        // every line in the database is in the format of username password email
+        // so we need to split the line into 3 parts and check if the username and password match
+        // if there is no match, we need to ask the user to try again
+
+        Kullanici k;
+
+    KULLANICI_GIRIS:
+        string username, password, line;
+        cout << "Kullanici adi: ";
+        cin >> username;
+        cout << "Sifre: ";
+        cin >> password;
+
+        ifstream file("./kullanicilar.txt");
+        if (file.is_open())
+        {
+            while (getline(file, line))
+            {
+                // split the line into 3 parts
+                // the first part is the username
+                // the second part is the password
+                // the third part is the email
+                string delimiter = " ";
+                string usernameFromFile = line.substr(0, line.find(delimiter));
+                line.erase(0, line.find(delimiter) + delimiter.length());
+                string passwordFromFile = line.substr(0, line.find(delimiter));
+
+                // check if the username and password match
+                if (usernameFromFile == username && passwordFromFile == password)
+                {
+                    k.setKullaniciAdi(username);
+                    cout << "Giris basarili" << endl;
+                    goto MUSTERI_MENU;
+                }
+                else
+                {
+                    system("clear");
+                    cout << "Boyle bir kullanici yoktur." << endl;
+                    goto KULLANICI_GIRIS;
+                }
+            }
+            // if we reach this point, it means that the username and password did not match
+            // cout << "Kullanici adi veya sifre yanlis" << endl;
+            // goto KULLANICI_GIRIS;
+        }
+        else
+        {
+            cout << "Dosya acilamadi" << endl;
+        }
+        file.close();
+
+    MUSTERI_MENU:
+        cout << "1 - Kiyafet kategorileri ve Urun secimi\n2 - Siparis takip\n3 - Sikayet ve Oneriler\n4 - Sifre Degistir\n5 - Geri don\n"
+             << endl;
+        int ops;
+        cin >> ops;
+
+        if (ops == 1)
+        {
+            KategorileriListele();
+        }
+        else if (ops == 2)
+        {
+            cout << "Siparis takip";
+        }
+        else if (ops == 3)
+        {
+            k.SikayetYaz();
+        }
+        else if (ops == 4)
+        {
+            cout << "Sifre Degistir";
+        }
+        else if (ops == 5)
+        {
+            system("clear");
+            MenuBaslat();
+        }
+        else
+        {
+            cout << "Hatali giris" << endl;
+            goto MUSTERI_MENU;
+        }
+    }
+
+    void KategorileriListele()
+    {
+        ifstream UrunlerFile("./urunler.txt");
+
+        string line;
+        SinglyLinkedList *Kategoriler = new SinglyLinkedList();
+
+        if (UrunlerFile.is_open())
+        {
+            while (getline(UrunlerFile, line))
+            {
+                string Kategori = line.substr(0, line.find(" "));
+                Kategoriler->addBack(Kategori);
+            }
+            Kategoriler->print();
+        }
+
+        UrunlerFile.close();
+    }
 };
 
 int main()
