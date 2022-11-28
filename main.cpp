@@ -43,7 +43,6 @@ bool SinglyLinkedList::empty() const
 void SinglyLinkedList::addBack(const string &e)
 {
     SinglyNode *v = new SinglyNode;
-    // If data already exists in the list, don't add it again
     for (SinglyNode *i = head; i != NULL; i = i->next)
     {
         if (i->elem == e)
@@ -88,7 +87,7 @@ void SinglyLinkedList::removeOrdered(const string &e)
         {
             SinglyNode *temp = previous->next;
             previous->next = previous->next->next;
-            delete temp; 
+            delete temp;
             return;
         }
 
@@ -280,8 +279,6 @@ public:
             kullanicilar.close();
 
             cout << "Kayit Basarili" << endl;
-
-            
         }
         else
         {
@@ -481,7 +478,6 @@ private:
     string renk;
 
 public:
-    // make set and get functions for private variables
     void set_fiyat(double fiyat) { this->fiyat = fiyat; }
     double get_fiyat() { return fiyat; }
 
@@ -549,7 +545,6 @@ public:
         {
             Kullanici user;
             user.kaydet();
-            // return back to menu
             system("clear");
             return MenuBaslat();
         }
@@ -615,11 +610,6 @@ public:
 
     void MusteriGiris()
     {
-        // Get the username and password from the user and check if there is a match in the database
-        // every line in the database is in the format of username password email
-        // so we need to split the line into 3 parts and check if the username and password match
-        // if there is no match, we need to ask the user to try again
-
         Kullanici k;
 
     KULLANICI_GIRIS:
@@ -634,10 +624,6 @@ public:
         {
             while (getline(file, line))
             {
-                // split the line into 3 parts
-                // the first part is the username
-                // the second part is the password
-                // the third part is the email
                 string delimiter = " ";
                 string usernameFromFile = line.substr(0, line.find(delimiter));
                 line.erase(0, line.find(delimiter) + delimiter.length());
