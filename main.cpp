@@ -88,7 +88,7 @@ void SinglyLinkedList::removeOrdered(const string &e)
         {
             SinglyNode *temp = previous->next;
             previous->next = previous->next->next;
-            delete temp; // previous->next 'i silinir
+            delete temp; 
             return;
         }
 
