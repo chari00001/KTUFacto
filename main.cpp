@@ -278,6 +278,10 @@ public:
             kullanicilar << getKullaniciAdi() << " " << getSifre() << " " << getEposta() << endl;
 
             kullanicilar.close();
+
+            cout << "Kayit Basarili" << endl;
+
+            
         }
         else
         {
@@ -520,7 +524,7 @@ public:
              << endl;
         cin >> opsiyon1;
         system("clear"); // system("cls") - windows
-    IF:
+    MENU:
         if (opsiyon1 == 1)
         {
             cout << "1 - Yönetici girişi\n2 - Müşteri girişi\n"
@@ -538,13 +542,16 @@ public:
             else
             {
                 cout << "Yanlış Seçim." << endl;
-                goto IF;
+                goto MENU;
             }
         }
         else if (opsiyon1 == 2)
         {
             Kullanici user;
             user.kaydet();
+            // return back to menu
+            system("clear");
+            return MenuBaslat();
         }
     }
 
@@ -558,6 +565,7 @@ public:
 
         cout << "Admin sifrenizi giriniz:" << endl;
         cin >> girilenSifre;
+        system("clear");
         if (sifre == girilenSifre)
         {
         YONETICI_MENU:
@@ -568,26 +576,32 @@ public:
 
             if (ops == 1)
             {
+                system("clear");
                 y.UrunEkle();
             }
             else if (ops == 2)
             {
+                system("clear");
                 cout << "Kurye ekle";
             }
             else if (ops == 3)
             {
+                system("clear");
                 y.SikayetOku();
             }
             else if (ops == 4)
             {
+                system("clear");
                 y.IndirimKoduEkle();
             }
             else if (ops == 5)
             {
+                system("clear");
                 cout << "Faturalar";
             }
             else
             {
+                system("clear");
                 cout << "Hatali giris" << endl;
                 goto YONETICI_MENU;
             }
@@ -640,12 +654,12 @@ public:
                 {
                     system("clear");
                     cout << "Boyle bir kullanici yoktur." << endl;
-                    goto KULLANICI_GIRIS;
+                    // goto KULLANICI_GIRIS;
                 }
             }
             // if we reach this point, it means that the username and password did not match
-            // cout << "Kullanici adi veya sifre yanlis" << endl;
-            // goto KULLANICI_GIRIS;
+            cout << "Kullanici adi veya sifre yanlis" << endl;
+            goto KULLANICI_GIRIS;
         }
         else
         {
