@@ -187,55 +187,36 @@ public:
 
     void SifreDegistir()
     {
+        // change the password of the user and add it to kullanicilar.txt in format of username:password:email 
         string yeniSifre;
-        string yeniSifreTekrar;
-        string eskiSifre;
-        string line;
-
-        cout << "Yeni Sifrenizi Giriniz: ";
+        cout << "Yeni Sifrenizi Giriniz: " << endl;
         getline(cin >> ws, yeniSifre);
-        cout << "Yeni Sifrenizi Tekrar Giriniz: ";
-        getline(cin >> ws, yeniSifreTekrar);
-        cout << "Eski Sifrenizi Giriniz: ";
-        getline(cin >> ws, eskiSifre);
 
-        if (yeniSifre == yeniSifreTekrar)
+        ifstream KullanicilarFile("./kullanicilar.txt");
+        ofstream KullanicilarFileTemp("./kullanicilartemp.txt");
+
+        if (KullanicilarFile.is_open() && KullanicilarFileTemp.is_open())
         {
-            ifstream kullanicilarFile("./kullanicilar.txt");
-            ofstream tempFile("./temp.txt");
-
-            if (kullanicilarFile.is_open() && tempFile.is_open())
+            string line;
+            while (getline(KullanicilarFile, line))
             {
-                while (getline(kullanicilarFile, line))
+                if (line.find(getKullaniciAdi()) != string::npos)
                 {
-                    if (line.find(getKullaniciAdi()) != string::npos)
-                    {
-                        if (line.find(eskiSifre) != string::npos)
-                        {
-                            tempFile << getKullaniciAdi() << " " << yeniSifre << " " << getEposta();
-                        }
-                        else
-                        {
-                            tempFile << line << endl;
-                        }
-                    }
-                    else
-                    {
-                        tempFile << line << endl;
-                    }
+                    string newLine = getKullaniciAdi() + " " + yeniSifre + " " + getEposta();
+                    KullanicilarFileTemp << newLine << endl;
+                }
+                else
+                {
+                    KullanicilarFileTemp << line << endl;
                 }
             }
+        }  
+        KullanicilarFile.close();
+        KullanicilarFileTemp.close();
 
-            kullanicilarFile.close();
-            tempFile.close();
+        remove("./kullanicilar.txt");
+        rename("./kullanicilartemp.txt", "./kullanicilar.txt");
 
-            remove("./kullanicilar.txt");
-            rename("./temp.txt", "./kullanicilar.txt");
-        }
-        else
-        {
-            cout << "Yeni Sifreleriniz Uyusmuyor!!!" << endl;
-        }
 
         // string line;
         // string usernameFromFile;
@@ -728,12 +709,12 @@ public:
                 else
                 {
                     system("clear");
-                    cout << "Boyle bir kullanici yoktur." << endl;
+                    
                     // goto KULLANICI_GIRIS;
                 }
             }
             // if we reach this point, it means that the username and password did not match
-            cout << "Kullanici adi veya sifre yanlis" << endl;
+            cout << "Boyle bir kullanici yoktur." << endl;
             goto KULLANICI_GIRIS;
         }
         else
