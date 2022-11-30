@@ -6,6 +6,7 @@
         "list": "cpp",
         "vector": "cpp",
         "string_view": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "fstream": "cpp"
     }
 }

@@ -185,6 +185,95 @@ public:
         }
     }
 
+    void SifreDegistir()
+    {
+        string yeniSifre;
+        string yeniSifreTekrar;
+        string eskiSifre;
+        string line;
+
+        cout << "Yeni Sifrenizi Giriniz: ";
+        getline(cin >> ws, yeniSifre);
+        cout << "Yeni Sifrenizi Tekrar Giriniz: ";
+        getline(cin >> ws, yeniSifreTekrar);
+        cout << "Eski Sifrenizi Giriniz: ";
+        getline(cin >> ws, eskiSifre);
+
+        if (yeniSifre == yeniSifreTekrar)
+        {
+            ifstream kullanicilarFile("./kullanicilar.txt");
+            ofstream tempFile("./temp.txt");
+
+            if (kullanicilarFile.is_open() && tempFile.is_open())
+            {
+                while (getline(kullanicilarFile, line))
+                {
+                    if (line.find(getKullaniciAdi()) != string::npos)
+                    {
+                        if (line.find(eskiSifre) != string::npos)
+                        {
+                            tempFile << getKullaniciAdi() << " " << yeniSifre << " " << getEposta();
+                        }
+                        else
+                        {
+                            tempFile << line << endl;
+                        }
+                    }
+                    else
+                    {
+                        tempFile << line << endl;
+                    }
+                }
+            }
+
+            kullanicilarFile.close();
+            tempFile.close();
+
+            remove("./kullanicilar.txt");
+            rename("./temp.txt", "./kullanicilar.txt");
+        }
+        else
+        {
+            cout << "Yeni Sifreleriniz Uyusmuyor!!!" << endl;
+        }
+
+        // string line;
+        // string usernameFromFile;
+        // string emailFromFile;
+
+        // string newPassword;
+
+        // cout << "Yeni sifrenizi giriniz: " << endl;
+        // cin >> newPassword;
+
+        // ifstream KullanicilarFile("./kullanicilar.txt");
+
+        // if (KullanicilarFile.is_open())
+        // {
+        //     while (getline(KullanicilarFile, line))
+        //     {
+        //         usernameFromFile = line.substr(0, line.find(" "));
+
+        //         if (usernameFromFile == kullaniciAdi)
+        //         {
+        //             line.erase(0, line.length());
+
+        //             ofstream KullanicilarFileYaz("./kullanicilar.txt", ios::app);
+
+        //             if (KullanicilarFileYaz.is_open())
+        //             {
+        //                 KullanicilarFileYaz << getKullaniciAdi() << " " << newPassword << " " << getEposta();
+        //             }
+
+        //             KullanicilarFileYaz.close();
+        //             break;
+        //         }
+        //     }
+
+        //     KullanicilarFile.close();
+        // }
+    }
+
     /*   string sifrele(const char *yazi, bool goster)
        {
            const char BACKSPACE = 8;
@@ -673,6 +762,7 @@ public:
         }
         else if (ops == 4)
         {
+            k.SifreDegistir();
             cout << "Sifre Degistir";
         }
         else if (ops == 5)
