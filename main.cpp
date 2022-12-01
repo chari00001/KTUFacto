@@ -14,6 +14,10 @@ class SinglyNode
 public:
     string elem;
     SinglyNode *next;
+
+    void printNode(){
+        cout << elem << endl;
+    }
 };
 
 class SinglyLinkedList
@@ -118,8 +122,6 @@ int SinglyLinkedList::print()
 
     return count - 1;
 }
-
-
 
 class Hatalar
 {
@@ -576,10 +578,11 @@ public:
 class Siparis : public Kiyafet
 {
 public:
-    Siparis(int siparis_no, 
-            double siparis_fiyat, 
-            int siparis_baslangic, 
+    Siparis(int siparis_no,
+            double siparis_fiyat,
+            int siparis_baslangic,
             int siparis_ulasim);
+
 private:
     int siparis_no;
     double siparis_fiyat;
@@ -695,7 +698,6 @@ public:
     void MusteriGiris()
     {
         Kullanici k;
-        
 
     KULLANICI_GIRIS:
         string username, password, line;
@@ -756,10 +758,6 @@ public:
             getline(cin >> ws, categorySelection);
 
             UrunleriListele(categorySelection);
-
-
-            
-
         }
         else if (ops == 2)
         {
@@ -807,29 +805,57 @@ public:
         return *Kategoriler;
     }
 
-    void UrunleriListele(string Selection){
+    void UrunleriListele(string Selection)
+    {
         ifstream UrunlerFile("./urunler.txt");
         string line;
+
+        SinglyLinkedList *Urunler = new SinglyLinkedList();
 
         if (UrunlerFile.is_open())
         {
             if (Selection == "0")
             {
+                
+                int index = 1;
                 while (getline(UrunlerFile, line))
                 {
-                    cout << line << endl; 
-                }   
-            } else {
+                    cout << index << " - " << line << endl;
+                    Urunler->addBack(line);
+                    index++;
+                }
+            }
+            else
+            {
+                int index = 1;
                 while (getline(UrunlerFile, line))
                 {
                     string categoryFromLine = line.substr(0, line.find(" "));
                     if (Selection == categoryFromLine)
                     {
-                        cout << line << endl;
-                    }  
-                }    
+                        cout << index << " - " << line << endl;
+                        Urunler->addBack(line);
+                        index++;
+                    }
+                }
+
+                int secilenUrunIndex;
+
+                cout << "Urun seciniz :" << endl;
+                cin >> secilenUrunIndex;
+
+                if (secilenUrunIndex > 0 && secilenUrunIndex <= index)
+                {
+                    UrunSec(*Urunler, secilenUrunIndex, index);
+                }
             }
+        } else {
+            cout << "Boyle bir dosya bulunamadi..." << endl;
         }
+    }
+
+    void UrunSec(SinglyLinkedList &urunler, int urunIndex, int index){
+        string Urunler[index];
     }
 };
 
