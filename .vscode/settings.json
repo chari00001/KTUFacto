@@ -7,6 +7,9 @@
         "vector": "cpp",
         "string_view": "cpp",
         "iosfwd": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "system_error": "cpp",
+        "regex": "cpp",
+        "*.tcc": "cpp"
     }
 }

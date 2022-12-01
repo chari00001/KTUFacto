@@ -25,7 +25,7 @@ public:
 
     bool empty() const;
     void addBack(const string &e);
-    void print();
+    int print();
 
     void removeOrdered(const string &e);
 };
@@ -99,12 +99,13 @@ void SinglyLinkedList::removeOrdered(const string &e)
              << e << " is not found" << endl;
 }
 
-void SinglyLinkedList::print()
+int SinglyLinkedList::print()
 {
+    int count = 0;
     if (empty())
     {
         cout << "List is empty !" << endl;
-        return;
+        return 0;
     }
 
     SinglyNode *first = head;
@@ -112,8 +113,13 @@ void SinglyLinkedList::print()
     {
         cout << first->elem << endl;
         first = first->next;
+        count++;
     }
+
+    return count - 1;
 }
+
+
 
 class Hatalar
 {
@@ -195,8 +201,6 @@ public:
         ifstream KullaniciFile("./kullanicilar.txt");
         ofstream KullaniciFileTemp("./kullanicilarTemp.txt");
 
-
-
         if (KullaniciFile.is_open() && KullaniciFileTemp.is_open())
         {
             string line;
@@ -204,7 +208,7 @@ public:
             {
                 if (line.find(getKullaniciAdi()) != string::npos)
                 {
-                    KullaniciFileTemp << getKullaniciAdi() << " "  << yeniSifre << " " << getEposta() << endl;
+                    KullaniciFileTemp << getKullaniciAdi() << " " << yeniSifre << " " << getEposta() << endl;
                 }
                 else
                 {
@@ -571,6 +575,11 @@ public:
 
 class Siparis : public Kiyafet
 {
+public:
+    Siparis(int siparis_no, 
+            double siparis_fiyat, 
+            int siparis_baslangic, 
+            int siparis_ulasim);
 private:
     int siparis_no;
     double siparis_fiyat;
@@ -686,6 +695,7 @@ public:
     void MusteriGiris()
     {
         Kullanici k;
+        
 
     KULLANICI_GIRIS:
         string username, password, line;
@@ -718,8 +728,6 @@ public:
                 else
                 {
                     system("clear");
-
-                    // goto KULLANICI_GIRIS;
                 }
             }
             // if we reach this point, it means that the username and password did not match
@@ -740,7 +748,18 @@ public:
 
         if (ops == 1)
         {
-            KategorileriListele();
+            SinglyLinkedList categories = KategorileriListele();
+            int categoryCount = categories.print();
+
+            string categorySelection;
+            cout << "Kategori seciniz: " << endl;
+            getline(cin >> ws, categorySelection);
+
+            UrunleriListele(categorySelection);
+
+
+            
+
         }
         else if (ops == 2)
         {
@@ -757,6 +776,7 @@ public:
         else if (ops == 5)
         {
             system("clear");
+            // Geri don
             MenuBaslat();
         }
         else
@@ -766,7 +786,7 @@ public:
         }
     }
 
-    void KategorileriListele()
+    SinglyLinkedList KategorileriListele()
     {
         ifstream UrunlerFile("./urunler.txt");
 
@@ -780,10 +800,36 @@ public:
                 string Kategori = line.substr(0, line.find(" "));
                 Kategoriler->addBack(Kategori);
             }
-            Kategoriler->print();
         }
 
         UrunlerFile.close();
+
+        return *Kategoriler;
+    }
+
+    void UrunleriListele(string Selection){
+        ifstream UrunlerFile("./urunler.txt");
+        string line;
+
+        if (UrunlerFile.is_open())
+        {
+            if (Selection == "0")
+            {
+                while (getline(UrunlerFile, line))
+                {
+                    cout << line << endl; 
+                }   
+            } else {
+                while (getline(UrunlerFile, line))
+                {
+                    string categoryFromLine = line.substr(0, line.find(" "));
+                    if (Selection == categoryFromLine)
+                    {
+                        cout << line << endl;
+                    }  
+                }    
+            }
+        }
     }
 };
 
