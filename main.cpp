@@ -187,36 +187,41 @@ public:
 
     void SifreDegistir()
     {
-        // change the password of the user and add it to kullanicilar.txt in format of username:password:email 
+        // change the password of the user and save it to the file in the format of username password email
         string yeniSifre;
         cout << "Yeni Sifrenizi Giriniz: " << endl;
         getline(cin >> ws, yeniSifre);
 
-        ifstream KullanicilarFile("./kullanicilar.txt");
-        ofstream KullanicilarFileTemp("./kullanicilartemp.txt");
+        ifstream KullaniciFile("./kullanicilar.txt");
+        ofstream KullaniciFileTemp("./kullanicilarTemp.txt");
 
-        if (KullanicilarFile.is_open() && KullanicilarFileTemp.is_open())
+
+
+        if (KullaniciFile.is_open() && KullaniciFileTemp.is_open())
         {
             string line;
-            while (getline(KullanicilarFile, line))
+            while (getline(KullaniciFile, line))
             {
                 if (line.find(getKullaniciAdi()) != string::npos)
                 {
-                    string newLine = getKullaniciAdi() + " " + yeniSifre + " " + getEposta();
-                    KullanicilarFileTemp << newLine << endl;
+                    KullaniciFileTemp << getKullaniciAdi() << " "  << yeniSifre << " " << getEposta() << endl;
                 }
                 else
                 {
-                    KullanicilarFileTemp << line << endl;
+                    KullaniciFileTemp << line << endl;
                 }
             }
-        }  
-        KullanicilarFile.close();
-        KullanicilarFileTemp.close();
+        }
+
+        KullaniciFile.close();
+        KullaniciFileTemp.close();
 
         remove("./kullanicilar.txt");
-        rename("./kullanicilartemp.txt", "./kullanicilar.txt");
+        rename("./kullanicilarTemp.txt", "./kullanicilar.txt");
 
+        cout << "Sifreniz Basariyla Degistirildi" << endl;
+
+        setSifre(yeniSifre);
 
         // string line;
         // string usernameFromFile;
@@ -698,18 +703,22 @@ public:
                 string usernameFromFile = line.substr(0, line.find(delimiter));
                 line.erase(0, line.find(delimiter) + delimiter.length());
                 string passwordFromFile = line.substr(0, line.find(delimiter));
+                line.erase(0, line.find(delimiter) + delimiter.length());
+                string emailFromFile = line.substr(0, line.find(delimiter));
 
                 // check if the username and password match
                 if (usernameFromFile == username && passwordFromFile == password)
                 {
                     k.setKullaniciAdi(username);
+                    k.setSifre(password);
+                    k.setEposta(emailFromFile);
                     cout << "Giris basarili" << endl;
                     goto MUSTERI_MENU;
                 }
                 else
                 {
                     system("clear");
-                    
+
                     // goto KULLANICI_GIRIS;
                 }
             }
@@ -744,7 +753,6 @@ public:
         else if (ops == 4)
         {
             k.SifreDegistir();
-            cout << "Sifre Degistir";
         }
         else if (ops == 5)
         {
