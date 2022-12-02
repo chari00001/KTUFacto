@@ -179,6 +179,43 @@ public:
     string getIndirimKodu() { return indirimKodu; }
     string getDTarihi() { return dTarihi; }
 
+    // string sifrele(char *bilgi, bool gizle = true)
+    // {
+    //     const char BACKSPACE = 8;
+    //     const char RETURN = 13;
+
+    //     string sifre;
+    //     char harf = 0;
+
+    //     cout << bilgi << " ";
+
+    //     while ((harf = _getch()) != RETURN)
+    //     {
+    //         if (harf == BACKSPACE)
+    //         {
+    //             if (sifre.length() != 0)
+    //             {
+    //                 if (gizle)
+    //                     cout << "\b \b";
+    //                 sifre.resize(sifre.length() - 1);
+    //             }
+    //         }
+    //         else if (harf == 0 || harf == 224) // handle escape sequences
+    //         {
+    //             _getch(); // ignore non printable chars
+    //             continue;
+    //         }
+    //         else
+    //         {
+    //             sifre += harf;
+    //             if (gizle)
+    //                 cout << '*';
+    //         }
+    //     }
+    //     cout << endl;
+    //     return sifre;
+    // }
+
     void SikayetYaz()
     {
         string sikayet;
@@ -196,10 +233,12 @@ public:
 
     void SifreDegistir()
     {
-        // change the password of the user and save it to the file in the format of username password email
         string yeniSifre;
-        cout << "Yeni Sifrenizi Giriniz: " << endl;
-        getline(cin >> ws, yeniSifre);
+        char harf;
+        // yeniSifre = sifrele("Yeni Sifrenizi Giriniz:", true);
+
+        cout << "Yeni sifrenizi giriniz: " << endl;
+        cin >> yeniSifre;
 
         ifstream KullaniciFile("./kullanicilar.txt");
         ofstream KullaniciFileTemp("./kullanicilarTemp.txt");
@@ -227,82 +266,8 @@ public:
         rename("./kullanicilarTemp.txt", "./kullanicilar.txt");
 
         cout << "Sifreniz Basariyla Degistirildi" << endl;
-
         setSifre(yeniSifre);
-
-        // string line;
-        // string usernameFromFile;
-        // string emailFromFile;
-
-        // string newPassword;
-
-        // cout << "Yeni sifrenizi giriniz: " << endl;
-        // cin >> newPassword;
-
-        // ifstream KullanicilarFile("./kullanicilar.txt");
-
-        // if (KullanicilarFile.is_open())
-        // {
-        //     while (getline(KullanicilarFile, line))
-        //     {
-        //         usernameFromFile = line.substr(0, line.find(" "));
-
-        //         if (usernameFromFile == kullaniciAdi)
-        //         {
-        //             line.erase(0, line.length());
-
-        //             ofstream KullanicilarFileYaz("./kullanicilar.txt", ios::app);
-
-        //             if (KullanicilarFileYaz.is_open())
-        //             {
-        //                 KullanicilarFileYaz << getKullaniciAdi() << " " << newPassword << " " << getEposta();
-        //             }
-
-        //             KullanicilarFileYaz.close();
-        //             break;
-        //         }
-        //     }
-
-        //     KullanicilarFile.close();
-        // }
     }
-
-    /*   string sifrele(const char *yazi, bool goster)
-       {
-           const char BACKSPACE = 8;
-           const char RETURN = 13;
-
-           string sifre;
-           unsigned char harf = 0;
-
-           cout << yazi;
-
-           while (harf = _getch() != RETURN)
-           {
-               if (harf == BACKSPACE)
-               {
-                   if (sifre.length() != 0)
-                   {
-                       if (goster)
-                           cout << "\b \b";
-                       sifre.resize(sifre.length() - 1);
-                   }
-               }
-               else if (harf == 0 || harf == 224) // handle escape sequences
-               {
-                   _getch(); // ignore non printable chars
-                   continue;
-               }
-               else
-               {
-                   sifre += harf;
-                   if (goster)
-                       cout << '*';
-               }
-           }
-           cout << endl;
-           return sifre;
-       }*/
 
     void kaydet()
     {
@@ -319,9 +284,7 @@ public:
             cout << "Kullanici Adi:	";
             getline(cin >> ws, kullaniciAdi);
 
-            // sifre = sifrele("Sifre:	", true);
-            cout << "\nŞifreniz: ";
-            getline(cin >> ws, sifre);
+            sifre = ("Sifrenizi Giriniz", true);
 
             cout << "\nEpostanizi Giriniz: ";
             getline(cin >> ws, ePosta);
@@ -611,7 +574,7 @@ public:
     MENU:
         if (opsiyon1 == 1)
         {
-            cout << "1 - Yönetici girişi\n2 - Müşteri girişi\n"
+            cout << "1 - Yonetici Girisi\n2 - Musteri Girisi\n"
                  << endl;
             cin >> opsiyon2;
             system("clear");
@@ -701,10 +664,11 @@ public:
         Kullanici k;
 
     KULLANICI_GIRIS:
-        string username, password, line;
+        string username, line, password;
         cout << "Kullanici adi: ";
         cin >> username;
-        cout << "Sifre: ";
+        // password = k.sifrele("Sifre:", true);
+        cout << "Sifrenizi giriniz: " << endl;
         cin >> password;
 
         ifstream file("./kullanicilar.txt");
@@ -719,7 +683,6 @@ public:
                 line.erase(0, line.find(delimiter) + delimiter.length());
                 string emailFromFile = line.substr(0, line.find(delimiter));
 
-                // check if the username and password match
                 if (usernameFromFile == username && passwordFromFile == password)
                 {
                     k.setKullaniciAdi(username);
@@ -844,10 +807,10 @@ public:
                 cout << "Urun seciniz :" << endl;
                 cin >> secilenUrunIndex;
 
-                if (secilenUrunIndex > 0 && secilenUrunIndex <= index)
-                {
-                    UrunSec(*Urunler, secilenUrunIndex, index);
-                }
+                // if (secilenUrunIndex > 0 && secilenUrunIndex <= index)
+                // {
+                //     UrunSec(*Urunler, secilenUrunIndex, index);
+                // }
             }
         }
         else
@@ -856,10 +819,9 @@ public:
         }
     }
 
-    void UrunSec(SinglyLinkedList &urunler, int urunIndex, int index)
-    {
-        string Urunler[index];
-    }
+    // void UrunSec(SinglyLinkedList &urunler, int urunIndex, const int index){
+    //     string Urunler[index];
+    // }
 };
 
 int main()
