@@ -10,6 +10,9 @@
         "fstream": "cpp",
         "system_error": "cpp",
         "regex": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "typeinfo": "cpp"
     }
 }

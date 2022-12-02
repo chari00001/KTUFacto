@@ -6,6 +6,7 @@
 #include <regex>
 #include <fstream>
 #include <list>
+#include <sstream>
 
 using namespace std;
 
@@ -31,6 +32,7 @@ public:
     bool empty() const;
     void addBack(const string &e);
     int print();
+    string getElement(int);
 
     void removeOrdered(const string &e);
 };
@@ -38,6 +40,26 @@ public:
 SinglyLinkedList::SinglyLinkedList()
 {
     head = NULL;
+}
+
+string SinglyLinkedList::getElement(int chosenIndex)
+{
+    SinglyNode *current = head;
+    if (empty())
+    {
+        cout << "List is empty !" << endl;
+        return "";
+    }
+    int count = 1;
+    while (current != NULL)
+    {
+        if (count == chosenIndex)
+        {
+            return current->elem;
+        }
+        count++;
+        current = current->next;
+    }
 }
 
 bool SinglyLinkedList::empty() const
@@ -138,12 +160,12 @@ public:
 class Kisi
 {
 private:
-    char *adSoyad;
-    char *telNo;
+    string adSoyad;
+    string telNo;
 
 public:
-    void setAdSoyad(char *adSoyad) { this->adSoyad = adSoyad; }
-    void setTelNo(char *telNo) { this->telNo = telNo; }
+    void setAdSoyad(string adSoyad) { this->adSoyad = adSoyad; }
+    void setTelNo(string telNo) { this->telNo = telNo; }
 
     string getAdSoyad() { return adSoyad; }
     string getTelNo() { return telNo; }
@@ -234,7 +256,6 @@ public:
     void SifreDegistir()
     {
         string yeniSifre;
-        char harf;
         // yeniSifre = sifrele("Yeni Sifrenizi Giriniz:", true);
 
         cout << "Yeni sifrenizi giriniz: " << endl;
@@ -250,7 +271,14 @@ public:
             {
                 if (line.find(getKullaniciAdi()) != string::npos)
                 {
-                    KullaniciFileTemp << getKullaniciAdi() << " " << yeniSifre << " " << getEposta() << endl;
+                    KullaniciFileTemp << getKullaniciAdi() << "-"
+                                      << yeniSifre << "-"
+                                      << getEposta() << "-"
+                                      << getAdres() << "-"
+                                      << getDTarihi() << "-"
+                                      << getIndirimKodu() << "-"
+                                      << getAdSoyad() << "-"
+                                      << getTelNo() << endl;
                 }
                 else
                 {
@@ -273,21 +301,42 @@ public:
     {
         fstream kullanicilar("./kullanicilar.txt", ios::app);
 
+        string adSoyad;
+        string telNo;
         string kullaniciAdi;
         string sifre;
         string ePosta;
+        string adres;
+        string indirimKodu;
+        string dTarihi;
 
     KONTROL:
         if (kullanicilar.is_open())
         {
+            cout << "Ad Soyad: ";
+            getline(cin >> ws, adSoyad);
 
-            cout << "Kullanici Adi:	";
+            cout << "Telefon No: ";
+            getline(cin >> ws, telNo);
+
+            cout << "Kullanici Adi: ";
             getline(cin >> ws, kullaniciAdi);
 
-            sifre = ("Sifrenizi Giriniz", true);
+            // sifre = sifrele("Sifrenizi Giriniz", true);
+            cout << "Sifre giriniz: " << endl;
+            cin >> sifre;
 
             cout << "\nEpostanizi Giriniz: ";
             getline(cin >> ws, ePosta);
+
+            cout << "\nIlcenizi giriniz: ";
+            getline(cin >> ws, adres);
+
+            cout << "\nIndirim kodu: ";
+            getline(cin >> ws, indirimKodu);
+
+            cout << "\nDogum tarihini giriniz: ";
+            getline(cin >> ws, dTarihi);
 
             if (kullaniciAdiKontrol(kullaniciAdi))
             {
@@ -319,7 +368,20 @@ public:
                 goto KONTROL;
             }
 
-            kullanicilar << getKullaniciAdi() << " " << getSifre() << " " << getEposta() << endl;
+            setAdSoyad(adSoyad);
+            setTelNo(telNo);
+            setDTarihi(dTarihi);
+            setAdres(adres);
+            setIndirimKodu(indirimKodu);
+
+            kullanicilar << getKullaniciAdi() << "-"
+                         << getSifre() << "-"
+                         << getEposta() << "-"
+                         << getAdres() << "-"
+                         << getDTarihi() << "-"
+                         << getIndirimKodu() << "-"
+                         << getAdSoyad() << "-"
+                         << getTelNo() << endl;
 
             kullanicilar.close();
 
@@ -664,7 +726,7 @@ public:
         Kullanici k;
 
     KULLANICI_GIRIS:
-        string username, line, password;
+        string username, password, line;
         cout << "Kullanici adi: ";
         cin >> username;
         // password = k.sifrele("Sifre:", true);
@@ -676,18 +738,35 @@ public:
         {
             while (getline(file, line))
             {
-                string delimiter = " ";
+                string delimiter = "-";
+
                 string usernameFromFile = line.substr(0, line.find(delimiter));
                 line.erase(0, line.find(delimiter) + delimiter.length());
                 string passwordFromFile = line.substr(0, line.find(delimiter));
                 line.erase(0, line.find(delimiter) + delimiter.length());
                 string emailFromFile = line.substr(0, line.find(delimiter));
+                line.erase(0, line.find(delimiter) + delimiter.length());
+                string addressFromFile = line.substr(0, line.find(delimiter));
+                line.erase(0, line.find(delimiter) + delimiter.length());
+                string birthdayFromFile = line.substr(0, line.find(delimiter));
+                line.erase(0, line.find(delimiter) + delimiter.length());
+                string codeFromFile = line.substr(0, line.find(delimiter));
+                line.erase(0, line.find(delimiter) + delimiter.length());
+                string nameSurnameFromFile = line.substr(0, line.find(delimiter));
+                line.erase(0, line.find(delimiter) + delimiter.length());
+                string phoneFromFile = line.substr(0, line.find(delimiter));
 
                 if (usernameFromFile == username && passwordFromFile == password)
                 {
                     k.setKullaniciAdi(username);
                     k.setSifre(password);
                     k.setEposta(emailFromFile);
+                    k.setAdres(addressFromFile);
+                    k.setDTarihi(birthdayFromFile);
+                    k.setIndirimKodu(codeFromFile);
+                    k.setAdSoyad(nameSurnameFromFile);
+                    k.setTelNo(phoneFromFile);
+
                     cout << "Giris basarili" << endl;
                     goto MUSTERI_MENU;
                 }
@@ -713,25 +792,30 @@ public:
 
         if (ops == 1)
         {
+            system("clear");
             SinglyLinkedList categories = KategorileriListele();
             int categoryCount = categories.print();
 
             string categorySelection;
-            cout << "Kategori seciniz: " << endl;
+            cout << "Kategori seciniz (Tum kategoriler icin 0 yaziniz): " << endl;
             getline(cin >> ws, categorySelection);
 
+            system("clear");
             UrunleriListele(categorySelection);
         }
         else if (ops == 2)
         {
+            system("clear");
             cout << "Siparis takip";
         }
         else if (ops == 3)
         {
+            system("clear");
             k.SikayetYaz();
         }
         else if (ops == 4)
         {
+            system("clear");
             k.SifreDegistir();
         }
         else if (ops == 5)
@@ -742,6 +826,7 @@ public:
         }
         else
         {
+            system("clear");
             cout << "Hatali giris" << endl;
             goto MUSTERI_MENU;
         }
@@ -777,10 +862,10 @@ public:
 
         if (UrunlerFile.is_open())
         {
+            int index = 1;
             if (Selection == "0")
             {
 
-                int index = 1;
                 while (getline(UrunlerFile, line))
                 {
                     cout << index << " - " << line << endl;
@@ -790,7 +875,7 @@ public:
             }
             else
             {
-                int index = 1;
+
                 while (getline(UrunlerFile, line))
                 {
                     string categoryFromLine = line.substr(0, line.find(" "));
@@ -801,16 +886,22 @@ public:
                         index++;
                     }
                 }
+            }
+            int secilenUrunIndex;
 
-                int secilenUrunIndex;
+        URUN_SEC:
+            cout << "Urun seciniz :" << endl;
+            cin >> secilenUrunIndex;
 
-                cout << "Urun seciniz :" << endl;
-                cin >> secilenUrunIndex;
-
-                // if (secilenUrunIndex > 0 && secilenUrunIndex <= index)
-                // {
-                //     UrunSec(*Urunler, secilenUrunIndex, index);
-                // }
+            if (secilenUrunIndex > 0 && secilenUrunIndex <= index)
+            {
+                system("clear");
+                UrunSec(*Urunler, secilenUrunIndex);
+            }
+            else
+            {
+                cout << "Gecersiz urun secimi...";
+                goto URUN_SEC;
             }
         }
         else
@@ -819,13 +910,56 @@ public:
         }
     }
 
-    // void UrunSec(SinglyLinkedList &urunler, int urunIndex, const int index){
-    //     string Urunler[index];
-    // }
+    void UrunSec(SinglyLinkedList &urunler, int urunIndex)
+    {
+        ofstream SiparislerFile("./siparisler.txt", ios::app);
+        string urun = urunler.getElement(urunIndex);
+
+        cout << urunler.print() << endl;
+
+        // Urun Fiyat
+        stringstream ss;
+        string tempUrun = urun;
+        tempUrun.erase(0, tempUrun.find(" ") + 1);
+        tempUrun.erase(0, tempUrun.find(" ") + 1);
+        string priceFromLine = tempUrun.substr(0, tempUrun.find(" "));
+        int priceFromLineInt;
+        ss << priceFromLine;
+        ss >> priceFromLineInt;
+
+        // Siparis Adet
+        int adet;
+        cout << "Adet giriniz: " << endl;
+        cin >> adet;
+
+        // Siparis SiparisNo
+        int siparisNo = rand() % 9999999 + 1000000;
+
+        // Siparis Fiyat
+        int siparisFiyat = adet * priceFromLineInt;
+
+        if (SiparislerFile.is_open())
+        {
+            SiparislerFile << urun << " "
+                           << siparisNo << " "
+                           << siparisFiyat << " "
+                           << "12.00"
+                           << " "
+                           << "13.00" << endl;
+        }
+        else
+        {
+            cout << "Boyle bir dosya bulunamadi..." << endl;
+        }
+
+        SiparislerFile.close();
+    }
 };
 
 int main()
 {
+    srand(time(NULL));
+
     Menu m;
 
     m.MenuBaslat();
