@@ -15,7 +15,8 @@ public:
     string elem;
     SinglyNode *next;
 
-    void printNode(){
+    void printNode()
+    {
         cout << elem << endl;
     }
 };
@@ -732,7 +733,6 @@ public:
                     system("clear");
                 }
             }
-            // if we reach this point, it means that the username and password did not match
             cout << "Boyle bir kullanici yoktur." << endl;
             goto KULLANICI_GIRIS;
         }
@@ -816,7 +816,7 @@ public:
         {
             if (Selection == "0")
             {
-                
+
                 int index = 1;
                 while (getline(UrunlerFile, line))
                 {
@@ -849,12 +849,15 @@ public:
                     UrunSec(*Urunler, secilenUrunIndex, index);
                 }
             }
-        } else {
+        }
+        else
+        {
             cout << "Boyle bir dosya bulunamadi..." << endl;
         }
     }
 
-    void UrunSec(SinglyLinkedList &urunler, int urunIndex, int index){
+    void UrunSec(SinglyLinkedList &urunler, int urunIndex, int index)
+    {
         string Urunler[index];
     }
 };
