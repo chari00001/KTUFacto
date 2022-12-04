@@ -7,6 +7,8 @@
 #include <fstream>
 #include <list>
 #include <sstream>
+#include <ctime>
+#include <chrono>
 
 using namespace std;
 
@@ -163,6 +165,11 @@ private:
 public:
     void setSaat(int Saat) { this->saat = Saat; }
     void setDakika(int Dakika) { this->dakika = Dakika; }
+    // string getDate(int *month, int *day, int *year);
+    // int checkDate(int month, int day, int year);
+    // void displayMessage(int status);
+    string getCurrentDate();
+    string getCurrentTime();
 };
 
 class Menu
@@ -172,8 +179,8 @@ public:
     void YoneticiGiris();
     void MusteriGiris();
     SinglyLinkedList KategorileriListele();
-    void UrunleriListele(string Selection);
-    void UrunSec(SinglyLinkedList &urunler, int urunIndex);
+    void UrunleriListele(string Selection, Kullanici k);
+    void UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k);
 };
 
 // FUNCTION DEFINITIONS
@@ -654,7 +661,34 @@ void Yonetici::IndirimKoduEkle()
     }
     IndirimlerFile.close();
 }
-void Yonetici::FaturaOku() {}
+void Yonetici::FaturaOku() {
+    ifstream FaturalarFile("./faturalar.txt");
+    string line;
+    string delimiter = "-";
+
+    int index = 1;
+    while (getline(FaturalarFile, line))
+    {
+        string AdSoyadFromFile = line.substr(0, line.find(delimiter));
+        line.erase(0, line.find(delimiter) + 1);
+        string UrunFromFile = line.substr(0, line.find(delimiter));
+        line.erase(0, line.find(delimiter) + 1);
+        string SiparisFiyatFromFile = line.substr(0, line.find(delimiter));
+        line.erase(0, line.find(delimiter) + 1);
+        string AdetFromFile = line.substr(0, line.find(delimiter));
+        line.erase(0, line.find(delimiter) + 1);
+        string SiparisZamaniFromFile = line.substr(0, line.find(delimiter));
+
+        cout << "\nFatura - " << index << endl;
+        cout << "\nAd Soyad: " << AdSoyadFromFile
+             << "\nUrun: " << UrunFromFile
+             << "\nSiparis Fiyati: " << SiparisFiyatFromFile
+             << "\nAdet: " << AdetFromFile
+             << "\nSiparis Saati: " << SiparisZamaniFromFile << endl;
+        index++;
+    }
+    
+}
 
 void Menu::MenuBaslat()
 {
@@ -757,14 +791,16 @@ YONETICI_MENU:
         case 5:
         {
             system("clear");
-            cout << "Faturalar";
+            y.FaturaOku();
             break;
         }
         default:
+        {
             system("clear");
             cout << "Hatali giris" << endl;
             goto YONETICI_MENU;
             break;
+        }
         }
     }
     else
@@ -775,20 +811,20 @@ YONETICI_MENU:
 
 void Menu::MusteriGiris()
 {
-KULLANICI_GIRIS:
     ifstream KullanicilarFile("./kullanicilar.txt");
     Kullanici k;
 
+    string username, password, line;
+
+KULLANICI_GIRIS:
+    cout << "Kullanici adi: ";
+    cin >> username;
+    cout << "Sifrenizi giriniz: " << endl;
+    cin >> password;
+    // password = k.sifrele("Sifre:", true);
+
     if (KullanicilarFile.is_open())
     {
-        string username, password, line;
-
-        cout << "Kullanici adi: ";
-        cin >> username;
-        cout << "Sifrenizi giriniz: " << endl;
-        cin >> password;
-        // password = k.sifrele("Sifre:", true);
-
         while (getline(KullanicilarFile, line))
         {
             string delimiter = "-";
@@ -809,8 +845,6 @@ KULLANICI_GIRIS:
             line.erase(0, line.find(delimiter) + delimiter.length());
             string phoneFromFile = line.substr(0, line.find(delimiter));
 
-            KullanicilarFile.close();
-
             if (usernameFromFile == username && passwordFromFile == password)
             {
                 k.setKullaniciAdi(username);
@@ -828,19 +862,20 @@ KULLANICI_GIRIS:
             else
             {
                 system("clear");
-                cout << "Kullanici adi veya sifre yanlis..." << endl;
-                goto KULLANICI_GIRIS;
             }
         }
+        KullanicilarFile.close();
+
         cout << "Kullanici bulunamadi." << endl;
         goto KULLANICI_GIRIS;
     }
     else
     {
-        cout << "Dosya acilamadi" << endl;
+        // cout << "Dosya acilamadi" << endl;
     }
 
 MUSTERI_MENU:
+    system("clear");
     cout << "1 - Kiyafet kategorileri ve Urun secimi\n"
          << "2 - Siparis takip\n"
          << "3 - Sikayet ve Oneriler\n"
@@ -863,7 +898,7 @@ MUSTERI_MENU:
         getline(cin >> ws, categorySelection);
 
         system("clear");
-        UrunleriListele(categorySelection);
+        UrunleriListele(categorySelection, k);
         break;
     }
     case 2:
@@ -922,7 +957,7 @@ SinglyLinkedList Menu::KategorileriListele()
     return *Kategoriler;
 }
 
-void Menu::UrunleriListele(string Selection)
+void Menu::UrunleriListele(string Selection, Kullanici k)
 {
     ifstream UrunlerFile("./urunler.txt");
     string line;
@@ -934,7 +969,6 @@ void Menu::UrunleriListele(string Selection)
         int index = 1;
         if (Selection == "0")
         {
-
             while (getline(UrunlerFile, line))
             {
                 cout << index << " - " << line << endl;
@@ -965,7 +999,7 @@ void Menu::UrunleriListele(string Selection)
         if (secilenUrunIndex > 0 && secilenUrunIndex <= index)
         {
             system("clear");
-            UrunSec(*Urunler, secilenUrunIndex);
+            UrunSec(*Urunler, secilenUrunIndex, k);
         }
         else
         {
@@ -979,12 +1013,12 @@ void Menu::UrunleriListele(string Selection)
     }
 }
 
-void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex)
+void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k)
 {
+    Zaman z;
     ofstream SiparislerFile("./siparisler.txt", ios::app);
+    ofstream FaturalarFile("./faturalar.txt", ios::app);
     string urun = urunler.getElement(urunIndex);
-
-    cout << urunler.print() << endl;
 
     // Urun Fiyat
     stringstream ss;
@@ -996,6 +1030,9 @@ void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex)
     int priceFromLineInt;
     ss << priceFromLine;
     ss >> priceFromLineInt;
+
+    cout << "Secilen urun: " << endl;
+    cout << urun << endl;
 
     // Siparis Adet
     int adet;
@@ -1010,19 +1047,75 @@ void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex)
 
     if (SiparislerFile.is_open())
     {
-        SiparislerFile << urun << " "
-                       << siparisNo << " "
-                       << siparisFiyat << " "
-                       << "12.00"
-                       << " "
-                       << "13.00" << endl;
-    }
-    else
-    {
+        SiparislerFile << k.getKullaniciAdi() << "-"
+                       << urun << "-"
+                       << siparisNo << "-"
+                       << siparisFiyat << "-"
+                       << z.getCurrentTime() << "-"
+                       << "bilinmiyor" << endl;
+        if (FaturalarFile.is_open()){
+            FaturalarFile << k.getAdSoyad() << "-"
+                          << urun << "-"
+                          << siparisFiyat << "-"
+                          << adet << "-"
+                          << z.getCurrentTime() << endl;
+        } else {
+            cout << "Boyle bir dosya bulunamadi..." << endl;
+        }
+    } else {
         cout << "Boyle bir dosya bulunamadi..." << endl;
     }
 
+    FaturalarFile.close();
     SiparislerFile.close();
+}
+
+string Zaman::getCurrentDate()
+{
+    auto start = std::chrono::system_clock::now();
+    auto end = std::chrono::system_clock::now();
+
+    std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+    // std::cout << "finished computation at " << std::ctime(&end_time)
+    //           << "elapsed time: " << elapsed_seconds.count() << "s"
+    //           << std::endl;
+    return std::ctime(&end_time);
+}
+
+string Zaman::getCurrentTime()
+{
+    string time;
+    string timeUnManipulated = getCurrentDate();
+    timeUnManipulated.erase(0, timeUnManipulated.find(" ") + 1);
+    timeUnManipulated.erase(0, timeUnManipulated.find(" ") + 1);
+    timeUnManipulated.erase(0, 3);
+    timeUnManipulated.erase(timeUnManipulated.find(" "), '\n');
+
+    time = timeUnManipulated;
+
+    string hour;
+    string min;
+
+    hour = time.substr(0, time.find(":"));
+    time.erase(0, time.find(":") + 1);
+    min = time.substr(0, time.find(":"));
+
+    stringstream ss;
+
+    int hourInt;
+    int minInt;
+
+    ss << hour;
+    ss >> hourInt;
+
+    ss << min;
+    ss >> minInt;
+
+    setSaat(hourInt);
+    setDakika(minInt);
+
+    return hour + ":" + min;
 }
 
 int main()
@@ -1030,7 +1123,6 @@ int main()
     srand(time(NULL));
 
     Menu m;
-
     m.MenuBaslat();
 
     cout << "\n\n\n";
