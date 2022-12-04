@@ -221,9 +221,23 @@ void SinglyLinkedList::addBack(const string &e)
         v->next = NULL;
     }
 
-    if (head == NULL) // ilk elemani alirken sikinti olur gibi?
+    // if (head == NULL) // ilk elemani alirken sikinti olur gibi?
+    //     head = v;
+    //     v->next = NULL;
+    // else // buralara bakin
+    // {
+    //     SinglyNode *first = head;
+    //     while (first->next != NULL)
+    //         first = first->next;
+    //     first->next = v;
+    // }
+
+    v->elem = e;
+    v->next = NULL;
+
+    if (head == NULL)
         head = v;
-    else // buralara bakin
+    else
     {
         SinglyNode *first = head;
         while (first->next != NULL)
@@ -675,6 +689,7 @@ void Menu::MenuBaslat()
             cout << "Yanlis Secim." << endl;
             break;
         }
+        break;
     }
     case 2:
     {
