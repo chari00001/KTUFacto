@@ -974,8 +974,9 @@ void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex)
     // Urun Fiyat
     stringstream ss;
     string tempUrun = urun;
-    tempUrun.erase(0, tempUrun.find(" ") + 1);
-    tempUrun.erase(0, tempUrun.find(" ") + 1);
+    string delimiter = " ";
+    tempUrun.erase(0, tempUrun.find(delimiter) + delimiter.length());
+    tempUrun.erase(0, tempUrun.find(delimiter) + delimiter.length());
     string priceFromLine = tempUrun.substr(0, tempUrun.find(" "));
     int priceFromLineInt;
     ss << priceFromLine;
