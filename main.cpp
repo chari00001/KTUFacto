@@ -30,7 +30,6 @@ public:
     void addBack(const string &e);
     int print();
     string getElement(int);
-
     void removeOrdered(const string &e);
 };
 
@@ -54,7 +53,6 @@ private:
 public:
     void setAdSoyad(string adSoyad) { this->adSoyad = adSoyad; }
     void setTelNo(string telNo) { this->telNo = telNo; }
-
     string getAdSoyad() { return adSoyad; }
     string getTelNo() { return telNo; }
 };
@@ -70,10 +68,7 @@ private:
     string dTarihi;
 
 public:
-    Kullanici(string KullaniciAdi = "")
-    {
-        kullaniciAdi = KullaniciAdi;
-    }
+    Kullanici(string KullaniciAdi = "") { setKullaniciAdi(KullaniciAdi); }
 
     void setKullaniciAdi(string kullaniciAdi) { this->kullaniciAdi = kullaniciAdi; }
     void setEposta(string ePosta) { this->ePosta = ePosta; }
@@ -89,19 +84,14 @@ public:
     string getIndirimKodu() { return indirimKodu; }
     string getDTarihi() { return dTarihi; }
 
-    string sifrele(char *bilgi, bool gizle = true);
-
     void SikayetYaz();
-
     void SifreDegistir();
-
     void kaydet();
-
     bool sifreKontrol(string sifre);
-
     bool kullaniciAdiKontrol(string kullanici_adi);
-
     bool ePostaKontrol(string ePosta);
+
+    string sifrele(char *bilgi, bool gizle = true);
 };
 
 class Yonetici : public Kisi
@@ -110,10 +100,7 @@ private:
     string sifre;
 
 public:
-    Yonetici(string Sifre = "") // sikinti
-    {
-        sifre = Sifre;
-    }
+    Yonetici(string Sifre = "") { sifre = Sifre; } // Default kullanma
     void set_sifre(char *) { this->sifre = sifre; }
 
     void UrunEkle();
@@ -140,18 +127,15 @@ private:
 
 public:
     void set_fiyat(double fiyat) { this->fiyat = fiyat; }
-    double get_fiyat() { return fiyat; }
-
     void set_kategori(string kategori) { this->kategori = kategori; }
-    string get_kategori() { return kategori; }
-
     void set_kiyafet_adi(string kiyafet_adi) { this->kiyafet_adi = kiyafet_adi; }
-    string get_kiyafet_adi() { return kiyafet_adi; }
-
     void set_boyut(string boyut) { this->boyut = boyut; }
-    string get_boyut() { return boyut; }
-
     void set_renk(string renk) { this->renk = renk; }
+
+    double get_fiyat() { return fiyat; }
+    string get_kategori() { return kategori; }
+    string get_kiyafet_adi() { return kiyafet_adi; }
+    string get_boyut() { return boyut; }
     string get_renk() { return renk; }
 };
 
@@ -175,21 +159,19 @@ class Zaman
 private:
     int saat;
     int dakika;
+public:
+    void setSaat(int Saat){this->saat = Saat;}
+    void setDakika(int Dakika){this->dakika = Dakika;}
 };
 
 class Menu
 {
 public:
     void MenuBaslat();
-
     void YoneticiGiris();
-
     void MusteriGiris();
-
     SinglyLinkedList KategorileriListele();
-
     void UrunleriListele(string Selection);
-
     void UrunSec(SinglyLinkedList &urunler, int urunIndex);
 };
 
