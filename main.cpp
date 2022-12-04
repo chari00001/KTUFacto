@@ -159,9 +159,10 @@ class Zaman
 private:
     int saat;
     int dakika;
+
 public:
-    void setSaat(int Saat){this->saat = Saat;}
-    void setDakika(int Dakika){this->dakika = Dakika;}
+    void setSaat(int Saat) { this->saat = Saat; }
+    void setDakika(int Dakika) { this->dakika = Dakika; }
 };
 
 class Menu
@@ -648,33 +649,48 @@ void Menu::MenuBaslat()
          << endl;
     cin >> opsiyon1;
     system("clear"); // system("cls") - windows
-MENU:                // switch case
-    if (opsiyon1 == 1)
+
+    switch (opsiyon1)
+    {
+    case 1:
     {
         cout << "1 - Yonetici Girisi\n2 - Musteri Girisi\n"
              << endl;
         cin >> opsiyon2;
         system("clear");
-        if (opsiyon2 == 1)
+
+        switch (opsiyon2)
+        {
+        case 1:
         {
             YoneticiGiris();
+            break;
         }
-        else if (opsiyon2 == 2)
+        case 2:
         {
             MusteriGiris();
+            break;
         }
-        else
-        {
-            cout << "Yanlış Seçim." << endl;
-            goto MENU;
+        default:
+            cout << "Yanlis Secim." << endl;
+            break;
         }
     }
-    else if (opsiyon1 == 2)
+    case 2:
     {
         Kullanici user;
         user.kaydet();
         system("clear");
         return MenuBaslat();
+        break;
+    }
+    case 3:
+    {
+        cout << "İyi günler dileriz...";
+        exit;
+    }
+    default:
+        break;
     }
 }
 
@@ -685,73 +701,80 @@ void Menu::YoneticiGiris()
     string sifre, girilenSifre;
     ifstream AdminFile("./yonetici.txt", ios::out);
     AdminFile >> sifre;
+    AdminFile.close();
 
+YONETICI_MENU:
     cout << "Admin sifrenizi giriniz:" << endl;
     cin >> girilenSifre;
     system("clear");
     if (sifre == girilenSifre)
     {
-    YONETICI_MENU:
         cout << "1 - Urun ekle\n2 - Kurye ekle\n3 - Sikayet ve Oneriler\n4 - Indirim kodu tanimla\n5 - Siparis Faturalari" << endl;
-        int ops;
+        int AdminOpsiyon;
+        cin >> AdminOpsiyon;
 
-        cin >> ops;
-
-        if (ops == 1)
+        switch (AdminOpsiyon)
+        {
+        case 1:
         {
             system("clear");
             y.UrunEkle();
+            break;
         }
-        else if (ops == 2)
+        case 2:
         {
             system("clear");
             cout << "Kurye ekle";
+            break;
         }
-        else if (ops == 3)
+        case 3:
         {
             system("clear");
             y.SikayetOku();
+            break;
         }
-        else if (ops == 4)
+        case 4:
         {
             system("clear");
             y.IndirimKoduEkle();
+            break;
         }
-        else if (ops == 5)
+        case 5:
         {
             system("clear");
             cout << "Faturalar";
+            break;
         }
-        else
-        {
+        default:
             system("clear");
             cout << "Hatali giris" << endl;
             goto YONETICI_MENU;
+            break;
         }
     }
     else
     {
         cout << "Yanlış şifre.";
     }
-    AdminFile.close();
 }
 
 void Menu::MusteriGiris()
 {
+KULLANICI_GIRIS:
+    ifstream KullanicilarFile("./kullanicilar.txt");
     Kullanici k;
 
-KULLANICI_GIRIS:
-    string username, password, line;
-    cout << "Kullanici adi: ";
-    cin >> username;
-    // password = k.sifrele("Sifre:", true);
-    cout << "Sifrenizi giriniz: " << endl;
-    cin >> password;
-
-    ifstream file("./kullanicilar.txt");
-    if (file.is_open())
+    if (KullanicilarFile.is_open())
     {
-        while (getline(file, line))
+        string username, password, line;
+
+        cout << "Kullanici adi: ";
+        cin >> username;
+        cout << "Sifrenizi giriniz: " << endl;
+        cin >> password;
+        // password = k.sifrele("Sifre:", true);
+
+        while (getline(KullanicilarFile, line))
         {
             string delimiter = "-";
 
@@ -771,6 +794,8 @@ KULLANICI_GIRIS:
             line.erase(0, line.find(delimiter) + delimiter.length());
             string phoneFromFile = line.substr(0, line.find(delimiter));
 
+            KullanicilarFile.close();
+
             if (usernameFromFile == username && passwordFromFile == password)
             {
                 k.setKullaniciAdi(username);
@@ -788,24 +813,31 @@ KULLANICI_GIRIS:
             else
             {
                 system("clear");
+                cout << "Kullanici adi veya sifre yanlis..." << endl;
+                goto KULLANICI_GIRIS;
             }
         }
-        cout << "Boyle bir kullanici yoktur." << endl;
+        cout << "Kullanici bulunamadi." << endl;
         goto KULLANICI_GIRIS;
     }
     else
     {
         cout << "Dosya acilamadi" << endl;
     }
-    file.close();
 
 MUSTERI_MENU:
-    cout << "1 - Kiyafet kategorileri ve Urun secimi\n2 - Siparis takip\n3 - Sikayet ve Oneriler\n4 - Sifre Degistir\n5 - Geri don\n"
+    cout << "1 - Kiyafet kategorileri ve Urun secimi\n"
+         << "2 - Siparis takip\n"
+         << "3 - Sikayet ve Oneriler\n"
+         << "4 - Sifre Degistir\n"
+         << "5 - Geri don\n"
          << endl;
-    int ops;
-    cin >> ops;
+    int MusteriOpsiyon;
+    cin >> MusteriOpsiyon;
 
-    if (ops == 1)
+    switch (MusteriOpsiyon)
+    {
+    case 1:
     {
         system("clear");
         SinglyLinkedList categories = KategorileriListele();
@@ -817,33 +849,40 @@ MUSTERI_MENU:
 
         system("clear");
         UrunleriListele(categorySelection);
+        break;
     }
-    else if (ops == 2)
+    case 2:
     {
         system("clear");
         cout << "Siparis takip";
+        break;
     }
-    else if (ops == 3)
+    case 3:
     {
         system("clear");
         k.SikayetYaz();
+        break;
     }
-    else if (ops == 4)
+    case 4:
     {
         system("clear");
         k.SifreDegistir();
+        break;
     }
-    else if (ops == 5)
+    case 5:
     {
         system("clear");
         // Geri don
         MenuBaslat();
+        break;
     }
-    else
+    default:
     {
         system("clear");
         cout << "Hatali giris" << endl;
         goto MUSTERI_MENU;
+        break;
+    }
     }
 }
 

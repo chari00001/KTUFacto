@@ -13,6 +13,7 @@
         "*.tcc": "cpp",
         "string": "cpp",
         "unordered_map": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "ostream": "cpp"
     }
 }
