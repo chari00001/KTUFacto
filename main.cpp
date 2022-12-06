@@ -12,6 +12,13 @@
 
 using namespace std;
 
+class Konumlar
+{
+private:
+    string varisYeri;
+    int dakika;
+};
+
 class SinglyNode
 {
 public:
@@ -44,6 +51,22 @@ public:
     void kullaniciTurkceKarakterUyari() { cout << "Kullanici Adi Turkce Karakter veya Bosluk Iceremez!!" << endl; }
     void sifreturkceKarakterUyari() { cout << "Sifre Turkce Karakter veya Bosluk Iceremez!!!" << endl; }
     void k_adiUzunluguUyari() { cout << "Kullanici Adi 8 Karakterden Az 24 Karakterden Fazla Olamaz" << endl; }
+};
+
+class Zaman
+{
+private:
+    int saat;
+    int dakika;
+
+public:
+    void setSaat(int Saat) { this->saat = Saat; }
+    void setDakika(int Dakika) { this->dakika = Dakika; }
+    // string getDate(int *month, int *day, int *year);
+    // int checkDate(int month, int day, int year);
+    // void displayMessage(int status);
+    string getCurrentDate();
+    string getCurrentTime();
 };
 
 class Kisi
@@ -114,8 +137,20 @@ public:
 
 class Kurye : public Kisi
 {
-    int dagitim_bitis; // TIME
+private:
+    Zaman dagitim_bitis; // TIME
     int siparis_no;
+
+public:
+    // make set get funcs
+    void set_dagitim_bitis(Zaman dagitim_bitis) { this->dagitim_bitis = dagitim_bitis; }
+    void set_siparis_no(int siparis_no) { this->siparis_no = siparis_no; }
+
+    Zaman get_dagitim_bitis() { return dagitim_bitis; }
+    int get_siparis_no() { return siparis_no; }
+
+    void KuryeAta(int siparisNo, Kullanici sipariAdresi);
+    Zaman VarisZamani(string siparis);
 };
 
 class Kiyafet
@@ -154,22 +189,6 @@ private:
     double siparis_fiyat;
     int siparis_baslangic; // TIME
     int siparis_ulasim;    // TIME
-};
-
-class Zaman
-{
-private:
-    int saat;
-    int dakika;
-
-public:
-    void setSaat(int Saat) { this->saat = Saat; }
-    void setDakika(int Dakika) { this->dakika = Dakika; }
-    // string getDate(int *month, int *day, int *year);
-    // int checkDate(int month, int day, int year);
-    // void displayMessage(int status);
-    string getCurrentDate();
-    string getCurrentTime();
 };
 
 class Menu
@@ -613,13 +632,31 @@ void Yonetici::UrunEkle()
 
     if (UrunlerFile.is_open())
     {
-        UrunlerFile << cat << " " << name << " " << price << " " << size << " " << color << endl;
+        UrunlerFile << cat << "-" << name << "-" << price << "-" << size << "-" << color << endl;
     }
     else
     {
         cout << "Boyle bir dosya yok." << endl;
     }
     UrunlerFile.close();
+}
+
+void Yonetici::KuryeEkle()
+{
+    ofstream KuryelerFile("./kuryeler.txt", ios::app);
+
+    string adSoyad;
+    string telNo;
+
+    cout << "Kurye'nin adi soyadi: " << endl;
+    getline(cin >> ws, adSoyad);
+
+    cout << "Kurye'nin telefon numarasi: " << endl;
+    cin >> telNo;
+
+    KuryelerFile << adSoyad << "-" << telNo << endl;
+
+    KuryelerFile.close();
 }
 
 void Yonetici::SikayetOku()
@@ -661,7 +698,8 @@ void Yonetici::IndirimKoduEkle()
     }
     IndirimlerFile.close();
 }
-void Yonetici::FaturaOku() {
+void Yonetici::FaturaOku()
+{
     ifstream FaturalarFile("./faturalar.txt");
     string line;
     string delimiter = "-";
@@ -687,7 +725,6 @@ void Yonetici::FaturaOku() {
              << "\nSiparis Saati: " << SiparisZamaniFromFile << endl;
         index++;
     }
-    
 }
 
 void Menu::MenuBaslat()
@@ -773,7 +810,7 @@ YONETICI_MENU:
         case 2:
         {
             system("clear");
-            cout << "Kurye ekle";
+            y.KuryeEkle();
             break;
         }
         case 3:
@@ -947,7 +984,7 @@ SinglyLinkedList Menu::KategorileriListele()
     {
         while (getline(UrunlerFile, line))
         {
-            string Kategori = line.substr(0, line.find(" "));
+            string Kategori = line.substr(0, line.find("-"));
             Kategoriler->addBack(Kategori);
         }
     }
@@ -981,7 +1018,7 @@ void Menu::UrunleriListele(string Selection, Kullanici k)
 
             while (getline(UrunlerFile, line))
             {
-                string categoryFromLine = line.substr(0, line.find(" "));
+                string categoryFromLine = line.substr(0, line.find("-"));
                 if (Selection == categoryFromLine)
                 {
                     cout << index << " - " << line << endl;
@@ -1013,9 +1050,67 @@ void Menu::UrunleriListele(string Selection, Kullanici k)
     }
 }
 
+Zaman Kurye::VarisZamani(string siparis)
+{
+    ifstream KonumlarFile("./konumlar.txt");
+    Zaman varisZamani;
+
+    for (int i = 0; i < 9; i++)
+    {
+        siparis.erase(0, siparis.find("-") + 1);
+    }
+
+    string SiparisZamaniFromFile = siparis.substr(0, siparis.find("-"));
+
+    cout << SiparisZamaniFromFile;
+
+    return varisZamani;
+}
+
+void Kurye::KuryeAta(int siparisNo, Kullanici siparisAdresi)
+{
+    ifstream KuryelerFile("./kuryeler.txt");
+    ifstream SiparislerFile("./siparisler.txt");
+
+    stringstream ss;
+
+    string siparisNoString;
+
+    ss << siparisNo;
+    ss >> siparisNoString;
+
+    string siparis;
+    string alinacakSiparis;
+
+    while (getline(SiparislerFile, siparis))
+    {
+        string tempSiparis = siparis;
+        for (int i = 0; i < 7; i++)
+        {
+            tempSiparis.erase(0, tempSiparis.find("-") + 1);
+        }
+
+        string SiparisNoFromFile = tempSiparis.substr(0, tempSiparis.find("-"));
+
+        if (siparisNoString == SiparisNoFromFile)
+        {
+            alinacakSiparis = siparis;
+            break;
+        }
+    }
+
+    cout << alinacakSiparis << endl;
+
+    VarisZamani(alinacakSiparis);
+
+    KuryelerFile.close();
+    SiparislerFile.close();
+}
+
 void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k)
 {
     Zaman z;
+    Kurye kurye;
     ofstream SiparislerFile("./siparisler.txt", ios::app);
     ofstream FaturalarFile("./faturalar.txt", ios::app);
     string urun = urunler.getElement(urunIndex);
@@ -1048,21 +1143,28 @@ void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k)
     if (SiparislerFile.is_open())
     {
         SiparislerFile << k.getKullaniciAdi() << "-"
+                       << k.getAdres() << "-"
                        << urun << "-"
                        << siparisNo << "-"
                        << siparisFiyat << "-"
-                       << z.getCurrentTime() << "-"
-                       << "bilinmiyor" << endl;
-        if (FaturalarFile.is_open()){
+                       << z.getCurrentTime() << endl;
+        kurye.KuryeAta(siparisNo, k.getAdres());
+        if (FaturalarFile.is_open())
+        {
             FaturalarFile << k.getAdSoyad() << "-"
                           << urun << "-"
                           << siparisFiyat << "-"
                           << adet << "-"
-                          << z.getCurrentTime() << endl;
-        } else {
+                          << z.getCurrentTime() << "-"
+                          << k.getAdres() << endl;
+        }
+        else
+        {
             cout << "Boyle bir dosya bulunamadi..." << endl;
         }
-    } else {
+    }
+    else
+    {
         cout << "Boyle bir dosya bulunamadi..." << endl;
     }
 
@@ -1072,7 +1174,7 @@ void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k)
 
 string Zaman::getCurrentDate()
 {
-    auto start = std::chrono::system_clock::now();
+    // auto start = std::chrono::system_clock::now();
     auto end = std::chrono::system_clock::now();
 
     std::time_t end_time = std::chrono::system_clock::to_time_t(end);

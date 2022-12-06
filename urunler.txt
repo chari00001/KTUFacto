@@ -1,7 +1,7 @@
-A UrunA1 100 XL Mavi
-A UrunA2 150 XXL Kirmizi
-B UrunB1 130 L Yesil
-B UrunB2 120 M Sari
-C UrunC1 160 S Mor
-C UrunC2 170 XS Siyah
-A UrunA3 180 XXS Beyaz
+A-UrunA1-100-XL-Mavi
+A-UrunA2-150-XXL-Kirmizi
+B-UrunB1-130-L-Yesil
+B-UrunB2-120-M-Sari
+C-UrunC1-160-S-Mor
+C-UrunC2-170-XS-Siyah
+A-UrunA3-180-XXS-Beyaz

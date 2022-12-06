@@ -1,10 +1,9 @@
-enes00001-A-UrunA3-180-XXS-Beyaz-7963823-360-12.00-13.00
-chari00001-A-UrunA1-100-XL-Mavi-6604740-300-12.00-13.00
-chari00001-A-UrunA1-100-XL-Mavi-10000176-100-12.00-13.00
-chari00001-C-UrunC2-170-XS-Siyah-1722841-680-12.00-13.00
-sinan00001-C-UrunC1-160-S Mor-1589923-640-19:10-bilinmiyor
-sinan00001-B-UrunB1-130-L-Yesil-10337907-520-19:14-bilinmiyor
-sinan00001-C-UrunC2-170-XS-Siyah-1111259-170-19:17-bilinmiyor
-enes00001-B-UrunB2-120-M-Sari-3488560-240-19:25-bilinmiyor
-chari00001-A UrunA3 180 XXS Beyaz-10944259-540-19:43-bilinmiyor
-enes00001-A UrunA2 150 XXL Kirmizi-3508707-600-19:44-bilinmiyor
+enes00001-Yomra-A-UrunA3-180-XXS-Beyaz-7963823-360-12.00
+chari00001-Ortahisar-C-UrunC2-170-XS-Siyah-1722841-680-12.00
+sinan00001-Arsin-C-UrunC1-160-S-Mor-1589923-640-19:10
+chari00001-Ortahisar-C-UrunC2-170-XS-Siyah-7677506-0-23:47
+chari00001-Ortahisar-A-UrunA1-100-XL-Mavi-6822972-0-23:53
+chari00001-Ortahisar-A-UrunA3-180-XXS-Beyaz-8178308-0-23:53
+chari00001-Ortahisar-A-UrunA2-150-XXL-Kirmizi-6484040-0-23:55
+chari00001-Ortahisar-A-UrunA1-100-XL-Mavi-8373084-0-23:56
+chari00001-Ortahisar-A-UrunA1-100-XL-Mavi-7345193-0-23:57
