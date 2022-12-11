@@ -9,7 +9,7 @@
 #include <sstream>
 #include <ctime>
 #include <chrono>
-
+#include <iomanip>
 using namespace std;
 
 class Konumlar
@@ -62,11 +62,13 @@ private:
 public:
     void setSaat(int Saat) { this->saat = Saat; }
     void setDakika(int Dakika) { this->dakika = Dakika; }
-    // string getDate(int *month, int *day, int *year);
-    // int checkDate(int month, int day, int year);
-    // void displayMessage(int status);
+    int getDakika() { return dakika; }
+    int getSaat() { return saat; }
     string getCurrentDate();
     string getCurrentTime();
+    Zaman operator+(Zaman &obj);
+    void printZaman();
+    void printUniversal();
 };
 
 class Kisi
@@ -149,7 +151,7 @@ public:
     Zaman get_dagitim_bitis() { return dagitim_bitis; }
     int get_siparis_no() { return siparis_no; }
 
-    void KuryeAta(int siparisNo, Kullanici sipariAdresi);
+    Zaman KuryeAta(int siparisNo, Kullanici sipariAdresi);
     Zaman VarisZamani(string siparis);
 };
 
@@ -1053,21 +1055,56 @@ void Menu::UrunleriListele(string Selection, Kullanici k)
 Zaman Kurye::VarisZamani(string siparis)
 {
     ifstream KonumlarFile("./konumlar.txt");
+    string Konum;
     Zaman varisZamani;
+    siparis.erase(0, siparis.find("-") + 1);
+    string siparisAdresiFromFile = siparis.substr(0, siparis.find("-"));
 
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < 8; i++)
     {
         siparis.erase(0, siparis.find("-") + 1);
     }
 
     string SiparisZamaniFromFile = siparis.substr(0, siparis.find("-"));
+    string sure;
 
-    cout << SiparisZamaniFromFile;
+    if (KonumlarFile.is_open())
+    {
+        while (getline(KonumlarFile, Konum))
+        {
+            if (Konum.substr(0, Konum.find("-")) == siparisAdresiFromFile)
+            {
+                Konum.erase(0, Konum.find("-") + 1);
+                sure = Konum.substr(0, Konum.find("-"));
+            }
+        }
+    }
+
+    int sureInt; // 70 dk
+    istringstream(sure) >> sureInt;
+
+    string siparisSaati = SiparisZamaniFromFile.substr(0, SiparisZamaniFromFile.find(":"));
+    SiparisZamaniFromFile.erase(0, SiparisZamaniFromFile.find(":") + 1);
+    string siparisDakikasi = SiparisZamaniFromFile.substr(0, SiparisZamaniFromFile.find("\n"));
+
+    int siparisSaatiInt, siparisDakikasiInt;
+    istringstream(siparisSaati) >> siparisSaatiInt;
+    istringstream(siparisDakikasi) >> siparisDakikasiInt;
+
+    Zaman siparisZamani;
+    siparisZamani.setSaat(siparisSaatiInt);
+    siparisZamani.setDakika(siparisDakikasiInt);
+
+    Zaman siparisSuresi;
+    siparisSuresi.setSaat(sureInt / 60);
+    siparisSuresi.setDakika(sureInt % 60);
+
+    varisZamani = siparisZamani + siparisSuresi;
 
     return varisZamani;
 }
 
-void Kurye::KuryeAta(int siparisNo, Kullanici siparisAdresi)
+Zaman Kurye::KuryeAta(int siparisNo, Kullanici siparisAdresi)
 {
     ifstream KuryelerFile("./kuryeler.txt");
     ifstream SiparislerFile("./siparisler.txt");
@@ -1099,12 +1136,19 @@ void Kurye::KuryeAta(int siparisNo, Kullanici siparisAdresi)
         }
     }
 
-    cout << alinacakSiparis << endl;
-
-    VarisZamani(alinacakSiparis);
+    Zaman varisZamani = VarisZamani(alinacakSiparis);
+//varisZamani.printUniversal();
+   //varisZamani.getDakika();
+   // varisZamani.getSaat();
 
     KuryelerFile.close();
     SiparislerFile.close();
+    return varisZamani;
+}
+void Zaman::printUniversal()
+{
+    cout << setfill('0') << setw(2) << saat << ":" << setw(2) << dakika << endl;
+    // cout << ( ( saat == 0 || saat == 12 ) ? 12 : saat % 12 ) << ":" << setfill("0") << setw( 2 ) << dakika << endl;
 }
 
 void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k)
@@ -1118,13 +1162,15 @@ void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k)
     // Urun Fiyat
     stringstream ss;
     string tempUrun = urun;
-    string delimiter = " ";
+    string delimiter = "-";
     tempUrun.erase(0, tempUrun.find(delimiter) + delimiter.length());
     tempUrun.erase(0, tempUrun.find(delimiter) + delimiter.length());
-    string priceFromLine = tempUrun.substr(0, tempUrun.find(" "));
+    string priceFromLine = tempUrun.substr(0, tempUrun.find(delimiter));
     int priceFromLineInt;
     ss << priceFromLine;
     ss >> priceFromLineInt;
+
+    cout << priceFromLine;
 
     cout << "Secilen urun: " << endl;
     cout << urun << endl;
@@ -1148,7 +1194,7 @@ void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k)
                        << siparisNo << "-"
                        << siparisFiyat << "-"
                        << z.getCurrentTime() << endl;
-        kurye.KuryeAta(siparisNo, k.getAdres());
+        kurye.KuryeAta(siparisNo, k.getAdres()).printUniversal();
         if (FaturalarFile.is_open())
         {
             FaturalarFile << k.getAdSoyad() << "-"
@@ -1174,14 +1220,10 @@ void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k)
 
 string Zaman::getCurrentDate()
 {
-    // auto start = std::chrono::system_clock::now();
     auto end = std::chrono::system_clock::now();
 
     std::time_t end_time = std::chrono::system_clock::to_time_t(end);
 
-    // std::cout << "finished computation at " << std::ctime(&end_time)
-    //           << "elapsed time: " << elapsed_seconds.count() << "s"
-    //           << std::endl;
     return std::ctime(&end_time);
 }
 
@@ -1218,6 +1260,36 @@ string Zaman::getCurrentTime()
     setDakika(minInt);
 
     return hour + ":" + min;
+}
+
+void Zaman::printZaman()
+{
+    cout << getSaat() << ":" << getDakika() << endl;
+}
+
+Zaman Zaman::operator+(Zaman &obj)
+{
+
+    if (this->dakika + obj.dakika >= 60)
+    {
+        this->saat += 1;
+        this->dakika = this->dakika + obj.dakika - 60;
+    }
+    else
+    {
+        this->dakika = obj.dakika + this->dakika;
+    }
+
+    if (this->saat + obj.saat >= 24)
+    {
+        this->saat = (this->saat + obj.saat) % 24;
+    }
+    else
+    {
+        this->saat = this->saat + obj.saat;
+    }
+
+    return *this;
 }
 
 int main()
