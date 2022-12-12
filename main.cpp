@@ -221,8 +221,9 @@ public:
     Zaman get_dagitim_bitis() { return dagitim_bitis; }
     int get_siparis_no() { return siparis_no; }
 
-    string KuryeAta(Siparis s);
+    string VarisZamaniHesapla(Siparis s);
     Zaman VarisZamani(Siparis s);
+    void KuryeAta(string varisZamani);
 };
 
 class Menu
@@ -1137,11 +1138,8 @@ Zaman Kurye::VarisZamani(Siparis s)
     return varisZamani;
 }
 
-string Kurye::KuryeAta(Siparis s)
+string Kurye::VarisZamaniHesapla(Siparis s)
 {
-    ifstream KuryelerFile("./kuryeler.txt");
-    ifstream SiparislerFile("./siparisler.txt");
-
     Zaman varisZamani = VarisZamani(s);
 
     string varisZamaniString;
@@ -1150,10 +1148,12 @@ string Kurye::KuryeAta(Siparis s)
     string varisZamaniSaat = to_string(varisZamani.getSaat());
     string varisZamaniDakika = to_string(varisZamani.getDakika());
 
-    if (varisZamaniSaat.length() == 1) {
+    if (varisZamaniSaat.length() == 1)
+    {
         varisZamaniSaat = "0" + varisZamaniSaat;
     }
-    if (varisZamaniDakika.length() == 1) {
+    if (varisZamaniDakika.length() == 1)
+    {
         varisZamaniDakika = "0" + varisZamaniDakika;
     }
 
@@ -1196,7 +1196,7 @@ void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k)
     int siparisFiyat = adet * priceFromLineInt;
 
     Siparis s(k.getKullaniciAdi(), k.getAdres(), urun, to_string(siparisNo), siparisFiyat, z.getCurrentTime());
-    s.set_siparis_ulasim(kurye.KuryeAta(s));
+    s.set_siparis_ulasim(kurye.VarisZamaniHesapla(s));
 
     if (SiparislerFile.is_open())
     {
@@ -1303,6 +1303,39 @@ Zaman Zaman::operator+(Zaman &obj)
     }
 
     return *this;
+}
+
+void Kurye::KuryeAta(string varisZamani)
+{
+    ifstream KuryelerFile("./kuryeler.txt");
+
+    string varisZamaniSaat = varisZamani.substr(0, varisZamani.find(":"));
+    varisZamani.erase(0, varisZamani.find(":") + 1);
+    string varisZamaniDakika = varisZamani.substr(0, varisZamani.find("\n"));
+
+    string line;
+    string ZamanFromFile; 
+    string SaatFromFile;
+    string DakikaFromFile;
+    string secilenKurye;
+    if (KuryelerFile.is_open())
+    {
+        while (getline(KuryelerFile, line))
+        {
+            line.erase(0, line.find("-") + 1);
+            line.erase(0, line.find("-") + 1);
+            ZamanFromFile = line.substr(0, line.find("\n"));
+            
+            SaatFromFile = ZamanFromFile.substr(0, ZamanFromFile.find(":"));
+            ZamanFromFile.erase(0, ZamanFromFile.find(":") + 1);
+            DakikaFromFile = ZamanFromFile.substr(0, ZamanFromFile.find("\n"));
+
+            if (SaatFromFile <= varisZamaniSaat)
+            {
+                secilenKurye = line;
+            }   
+        }
+    }
 }
 
 int main()
