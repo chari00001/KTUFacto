@@ -151,7 +151,7 @@ public:
     Zaman get_dagitim_bitis() { return dagitim_bitis; }
     int get_siparis_no() { return siparis_no; }
 
-    Zaman KuryeAta(int siparisNo, Kullanici sipariAdresi);
+    string KuryeAta(int siparisNo, string sipariAdresi);
     Zaman VarisZamani(string siparis);
 };
 
@@ -1054,6 +1054,7 @@ void Menu::UrunleriListele(string Selection, Kullanici k)
 
 Zaman Kurye::VarisZamani(string siparis)
 {
+    cout << "Siparis: " << siparis << endl;
     ifstream KonumlarFile("./konumlar.txt");
     string Konum;
     Zaman varisZamani;
@@ -1067,6 +1068,9 @@ Zaman Kurye::VarisZamani(string siparis)
 
     string SiparisZamaniFromFile = siparis.substr(0, siparis.find("-"));
     string sure;
+
+    cout << "Siparis zamani: " << SiparisZamaniFromFile << endl;
+    cout << "Siparis adresi: " << siparisAdresiFromFile << endl;
 
     if (KonumlarFile.is_open())
     {
@@ -1099,12 +1103,15 @@ Zaman Kurye::VarisZamani(string siparis)
     siparisSuresi.setSaat(sureInt / 60);
     siparisSuresi.setDakika(sureInt % 60);
 
+    // cout << "Siparis zamani: " << siparisZamani.getSaat() << ":" << siparisZamani.getDakika() << endl;
+    // cout << "Siparis sure: " << siparisSuresi.getSaat() << ":" << siparisSuresi.getDakika() << endl;
+
     varisZamani = siparisZamani + siparisSuresi;
 
     return varisZamani;
 }
 
-Zaman Kurye::KuryeAta(int siparisNo, Kullanici siparisAdresi)
+string Kurye::KuryeAta(int siparisNo, string siparisAdresi)
 {
     ifstream KuryelerFile("./kuryeler.txt");
     ifstream SiparislerFile("./siparisler.txt");
@@ -1116,12 +1123,12 @@ Zaman Kurye::KuryeAta(int siparisNo, Kullanici siparisAdresi)
     ss << siparisNo;
     ss >> siparisNoString;
 
-    string siparis;
+    string line;
     string alinacakSiparis;
 
-    while (getline(SiparislerFile, siparis))
+    while (getline(SiparislerFile, line))
     {
-        string tempSiparis = siparis;
+        string tempSiparis = line;
         for (int i = 0; i < 7; i++)
         {
             tempSiparis.erase(0, tempSiparis.find("-") + 1);
@@ -1131,19 +1138,23 @@ Zaman Kurye::KuryeAta(int siparisNo, Kullanici siparisAdresi)
 
         if (siparisNoString == SiparisNoFromFile)
         {
-            alinacakSiparis = siparis;
+            alinacakSiparis = line;
             break;
         }
     }
 
-    Zaman varisZamani = VarisZamani(alinacakSiparis);
-//varisZamani.printUniversal();
-   //varisZamani.getDakika();
-   // varisZamani.getSaat();
+    cout << "Alinacak siparis: " << alinacakSiparis << endl;
 
-    KuryelerFile.close();
-    SiparislerFile.close();
-    return varisZamani;
+    Zaman varisZamani = VarisZamani(alinacakSiparis);
+    varisZamani.printUniversal();
+    // convert varisZamani to string in format of "varisZamani.getSaat():varisZamani.getDakika()"
+    string varisZamaniString;
+    stringstream ss2;
+    ss2 << varisZamani.getSaat() << ":" << varisZamani.getDakika();
+    ss2 >> varisZamaniString;
+
+
+    return varisZamaniString;
 }
 void Zaman::printUniversal()
 {
@@ -1194,7 +1205,7 @@ void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k)
                        << siparisNo << "-"
                        << siparisFiyat << "-"
                        << z.getCurrentTime() << endl;
-        kurye.KuryeAta(siparisNo, k.getAdres()).printUniversal();
+        cout << kurye.KuryeAta(siparisNo, k.getAdres());
         if (FaturalarFile.is_open())
         {
             FaturalarFile << k.getAdSoyad() << "-"
