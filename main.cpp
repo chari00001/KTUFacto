@@ -10,6 +10,8 @@
 #include <ctime>
 #include <chrono>
 #include <iomanip>
+#include <vector>
+
 using namespace std;
 
 class Konumlar
@@ -137,24 +139,6 @@ public:
     void FaturaOku();
 };
 
-class Kurye : public Kisi
-{
-private:
-    Zaman dagitim_bitis; // TIME
-    int siparis_no;
-
-public:
-    // make set get funcs
-    void set_dagitim_bitis(Zaman dagitim_bitis) { this->dagitim_bitis = dagitim_bitis; }
-    void set_siparis_no(int siparis_no) { this->siparis_no = siparis_no; }
-
-    Zaman get_dagitim_bitis() { return dagitim_bitis; }
-    int get_siparis_no() { return siparis_no; }
-
-    string KuryeAta(int siparisNo, string sipariAdresi);
-    Zaman VarisZamani(string siparis);
-};
-
 class Kiyafet
 {
 private:
@@ -181,16 +165,64 @@ public:
 class Siparis : public Kiyafet
 {
 public:
-    Siparis(int siparis_no,
-            double siparis_fiyat,
-            int siparis_baslangic,
-            int siparis_ulasim);
+    Siparis(string kullaniciAdi = " ",
+            string siparisAdresi = " ",
+            string urunBilgisi = " ",
+            string siparisNo = "0000000",
+            double siparis_fiyat = 0,
+            string siparis_baslangic = "00:00",
+            string siparis_ulasim = "00:00")
+    {
+        this->kullanici_adi = kullaniciAdi;
+        this->siparis_adresi = siparisAdresi;
+        this->urun_bilgisi = urunBilgisi;
+        this->siparis_no = siparisNo;
+        this->siparis_fiyat = siparis_fiyat;
+        this->siparis_baslangic = siparis_baslangic;
+        this->siparis_ulasim = siparis_ulasim;
+    }
+
+    void set_kullanici_adi(string kullanici_adi) { this->kullanici_adi = kullanici_adi; }
+    void set_siparis_adresi(string siparis_adresi) { this->siparis_adresi = siparis_adresi; }
+    void set_urun_bilgisi(string urun_bilgisi) { this->urun_bilgisi = urun_bilgisi; }
+    void set_siparis_no(string siparis_no) { this->siparis_no = siparis_no; }
+    void set_siparis_fiyat(double siparis_fiyat) { this->siparis_fiyat = siparis_fiyat; }
+    void set_siparis_baslangic(string siparis_baslangic) { this->siparis_baslangic = siparis_baslangic; }
+    void set_siparis_ulasim(string siparis_ulasim) { this->siparis_ulasim = siparis_ulasim; }
+
+    string get_kullanici_adi() { return kullanici_adi; }
+    string get_siparis_adresi() { return siparis_adresi; }
+    string get_urun_bilgisi() { return urun_bilgisi; }
+    string get_siparis_no() { return siparis_no; }
+    double get_siparis_fiyat() { return siparis_fiyat; }
+    string get_siparis_baslangic() { return siparis_baslangic; }
+    string get_siparis_ulasim() { return siparis_ulasim; }
 
 private:
-    int siparis_no;
+    string kullanici_adi;
+    string siparis_adresi;
+    string urun_bilgisi;
+    string siparis_no;
     double siparis_fiyat;
-    int siparis_baslangic; // TIME
-    int siparis_ulasim;    // TIME
+    string siparis_baslangic;
+    string siparis_ulasim;
+};
+
+class Kurye : public Kisi
+{
+private:
+    Zaman dagitim_bitis; // TIME
+    int siparis_no;
+
+public:
+    void set_dagitim_bitis(Zaman dagitim_bitis) { this->dagitim_bitis = dagitim_bitis; }
+    void set_siparis_no(int siparis_no) { this->siparis_no = siparis_no; }
+
+    Zaman get_dagitim_bitis() { return dagitim_bitis; }
+    int get_siparis_no() { return siparis_no; }
+
+    string KuryeAta(Siparis s);
+    Zaman VarisZamani(Siparis s);
 };
 
 class Menu
@@ -383,43 +415,44 @@ void Kullanici::SikayetYaz()
 
 void Kullanici::SifreDegistir()
 {
+    vector<string> list;
+
     string yeniSifre;
     // yeniSifre = sifrele("Yeni Sifrenizi Giriniz:", true);
 
-    cout << "Yeni sifrenizi giriniz: " << endl;
+    cout << "Yeni Sifrenizi Giriniz: ";
     cin >> yeniSifre;
 
     ifstream KullaniciFile("./kullanicilar.txt");
-    ofstream KullaniciFileTemp("./kullanicilarTemp.txt");
 
-    if (KullaniciFile.is_open() && KullaniciFileTemp.is_open())
+    if (KullaniciFile.is_open())
     {
         string line;
         while (getline(KullaniciFile, line))
         {
-            if (line.find(getKullaniciAdi()) != string::npos)
+            string usernameFromFile = line.substr(0, line.find("-"));
+            if (usernameFromFile.compare(getKullaniciAdi()) == 0)
             {
-                KullaniciFileTemp << getKullaniciAdi() << "-"
-                                  << yeniSifre << "-"
-                                  << getEposta() << "-"
-                                  << getAdres() << "-"
-                                  << getDTarihi() << "-"
-                                  << getIndirimKodu() << "-"
-                                  << getAdSoyad() << "-"
-                                  << getTelNo() << endl;
+                string temp = getKullaniciAdi() + "-" + yeniSifre + "-" + getEposta() + "-" + getAdres() + "-" + getDTarihi() + "-" + getIndirimKodu() + "-" + getAdSoyad() + "-" + getTelNo();
+
+                list.push_back(temp);
             }
             else
             {
-                KullaniciFileTemp << line << endl;
+                list.push_back(line);
             }
         }
     }
-
     KullaniciFile.close();
-    KullaniciFileTemp.close();
 
-    remove("./kullanicilar.txt");
-    rename("./kullanicilarTemp.txt", "./kullanicilar.txt");
+    fstream s("./kullanicilar.txt", ofstream::out | ofstream::trunc);
+
+    for (int i = 0; i < list.size(); i++)
+    {
+        s << list[i] << endl;
+    }
+
+    s.close();
 
     cout << "Sifreniz Basariyla Degistirildi" << endl;
     setSifre(yeniSifre);
@@ -850,12 +883,12 @@ YONETICI_MENU:
 
 void Menu::MusteriGiris()
 {
+KULLANICI_GIRIS:
     ifstream KullanicilarFile("./kullanicilar.txt");
     Kullanici k;
 
     string username, password, line;
 
-KULLANICI_GIRIS:
     cout << "Kullanici adi: ";
     cin >> username;
     cout << "Sifrenizi giriniz: " << endl;
@@ -903,6 +936,7 @@ KULLANICI_GIRIS:
                 system("clear");
             }
         }
+
         KullanicilarFile.close();
 
         cout << "Kullanici bulunamadi." << endl;
@@ -1052,31 +1086,21 @@ void Menu::UrunleriListele(string Selection, Kullanici k)
     }
 }
 
-Zaman Kurye::VarisZamani(string siparis)
+Zaman Kurye::VarisZamani(Siparis s)
 {
-    cout << "Siparis: " << siparis << endl;
     ifstream KonumlarFile("./konumlar.txt");
-    string Konum;
+
     Zaman varisZamani;
-    siparis.erase(0, siparis.find("-") + 1);
-    string siparisAdresiFromFile = siparis.substr(0, siparis.find("-"));
 
-    for (int i = 0; i < 8; i++)
-    {
-        siparis.erase(0, siparis.find("-") + 1);
-    }
+    cout << "Siparis zamani: " << s.get_siparis_baslangic() << endl;
+    cout << "Siparis adresi: " << s.get_siparis_adresi() << endl;
 
-    string SiparisZamaniFromFile = siparis.substr(0, siparis.find("-"));
-    string sure;
-
-    cout << "Siparis zamani: " << SiparisZamaniFromFile << endl;
-    cout << "Siparis adresi: " << siparisAdresiFromFile << endl;
-
+    string Konum, sure;
     if (KonumlarFile.is_open())
     {
         while (getline(KonumlarFile, Konum))
         {
-            if (Konum.substr(0, Konum.find("-")) == siparisAdresiFromFile)
+            if (Konum.substr(0, Konum.find("-")) == s.get_siparis_adresi())
             {
                 Konum.erase(0, Konum.find("-") + 1);
                 sure = Konum.substr(0, Konum.find("-"));
@@ -1084,12 +1108,14 @@ Zaman Kurye::VarisZamani(string siparis)
         }
     }
 
-    int sureInt; // 70 dk
+    int sureInt;
     istringstream(sure) >> sureInt;
 
-    string siparisSaati = SiparisZamaniFromFile.substr(0, SiparisZamaniFromFile.find(":"));
-    SiparisZamaniFromFile.erase(0, SiparisZamaniFromFile.find(":") + 1);
-    string siparisDakikasi = SiparisZamaniFromFile.substr(0, SiparisZamaniFromFile.find("\n"));
+    string siparisBaslangic = s.get_siparis_baslangic();
+
+    string siparisSaati = siparisBaslangic.substr(0, siparisBaslangic.find(":"));
+    siparisBaslangic.erase(0, siparisBaslangic.find(":") + 1);
+    string siparisDakikasi = siparisBaslangic.substr(0, siparisBaslangic.find("-"));
 
     int siparisSaatiInt, siparisDakikasiInt;
     istringstream(siparisSaati) >> siparisSaatiInt;
@@ -1103,63 +1129,35 @@ Zaman Kurye::VarisZamani(string siparis)
     siparisSuresi.setSaat(sureInt / 60);
     siparisSuresi.setDakika(sureInt % 60);
 
-    // cout << "Siparis zamani: " << siparisZamani.getSaat() << ":" << siparisZamani.getDakika() << endl;
-    // cout << "Siparis sure: " << siparisSuresi.getSaat() << ":" << siparisSuresi.getDakika() << endl;
+    cout << "Siparis zamani: " << siparisZamani.getSaat() << ":" << siparisZamani.getDakika() << endl;
+    cout << "Siparis sure: " << siparisSuresi.getSaat() << ":" << siparisSuresi.getDakika() << endl;
 
     varisZamani = siparisZamani + siparisSuresi;
 
     return varisZamani;
 }
 
-string Kurye::KuryeAta(int siparisNo, string siparisAdresi)
+string Kurye::KuryeAta(Siparis s)
 {
     ifstream KuryelerFile("./kuryeler.txt");
     ifstream SiparislerFile("./siparisler.txt");
 
+    Zaman varisZamani = VarisZamani(s);
+
+    string varisZamaniString;
     stringstream ss;
 
-    string siparisNoString;
+    string varisZamaniSaat = to_string(varisZamani.getSaat());
+    string varisZamaniDakika = to_string(varisZamani.getDakika());
 
-    ss << siparisNo;
-    ss >> siparisNoString;
-
-    string line;
-    string alinacakSiparis;
-
-    while (getline(SiparislerFile, line))
-    {
-        string tempSiparis = line;
-        for (int i = 0; i < 7; i++)
-        {
-            tempSiparis.erase(0, tempSiparis.find("-") + 1);
-        }
-
-        string SiparisNoFromFile = tempSiparis.substr(0, tempSiparis.find("-"));
-
-        if (siparisNoString == SiparisNoFromFile)
-        {
-            alinacakSiparis = line;
-            break;
-        }
+    if (varisZamaniSaat.length() == 1) {
+        varisZamaniSaat = "0" + varisZamaniSaat;
+    }
+    if (varisZamaniDakika.length() == 1) {
+        varisZamaniDakika = "0" + varisZamaniDakika;
     }
 
-    cout << "Alinacak siparis: " << alinacakSiparis << endl;
-
-    Zaman varisZamani = VarisZamani(alinacakSiparis);
-    varisZamani.printUniversal();
-    // convert varisZamani to string in format of "varisZamani.getSaat():varisZamani.getDakika()"
-    string varisZamaniString;
-    stringstream ss2;
-    ss2 << varisZamani.getSaat() << ":" << varisZamani.getDakika();
-    ss2 >> varisZamaniString;
-
-
-    return varisZamaniString;
-}
-void Zaman::printUniversal()
-{
-    cout << setfill('0') << setw(2) << saat << ":" << setw(2) << dakika << endl;
-    // cout << ( ( saat == 0 || saat == 12 ) ? 12 : saat % 12 ) << ":" << setfill("0") << setw( 2 ) << dakika << endl;
+    return varisZamaniSaat + ":" + varisZamaniDakika;
 }
 
 void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k)
@@ -1197,23 +1195,27 @@ void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k)
     // Siparis Fiyat
     int siparisFiyat = adet * priceFromLineInt;
 
+    Siparis s(k.getKullaniciAdi(), k.getAdres(), urun, to_string(siparisNo), siparisFiyat, z.getCurrentTime());
+    s.set_siparis_ulasim(kurye.KuryeAta(s));
+
     if (SiparislerFile.is_open())
     {
-        SiparislerFile << k.getKullaniciAdi() << "-"
-                       << k.getAdres() << "-"
-                       << urun << "-"
-                       << siparisNo << "-"
-                       << siparisFiyat << "-"
-                       << z.getCurrentTime() << endl;
-        cout << kurye.KuryeAta(siparisNo, k.getAdres());
+        SiparislerFile << s.get_kullanici_adi() << "-"
+                       << s.get_siparis_adresi() << "-"
+                       << s.get_urun_bilgisi() << "-"
+                       << s.get_siparis_no() << "-"
+                       << s.get_siparis_fiyat() << "-"
+                       << s.get_siparis_baslangic() << "-"
+                       << s.get_siparis_ulasim() << endl;
+
         if (FaturalarFile.is_open())
         {
-            FaturalarFile << k.getAdSoyad() << "-"
-                          << urun << "-"
-                          << siparisFiyat << "-"
-                          << adet << "-"
-                          << z.getCurrentTime() << "-"
-                          << k.getAdres() << endl;
+            FaturalarFile << s.get_kullanici_adi() << "-"
+                          << s.get_siparis_adresi() << "-"
+                          << s.get_urun_bilgisi() << "-"
+                          << s.get_siparis_no() << "-"
+                          << s.get_siparis_fiyat() << "-"
+                          << s.get_siparis_baslangic() << endl;
         }
         else
         {
