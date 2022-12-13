@@ -69,8 +69,9 @@ public:
     string getCurrentDate();
     string getCurrentTime();
     Zaman operator+(Zaman &obj);
+    bool operator<=(Zaman &obj);
     void printZaman();
-    void printUniversal();
+    Zaman stringToZaman(string zaman);
 };
 
 class Kisi
@@ -224,6 +225,7 @@ public:
     string VarisZamaniHesapla(Siparis s);
     Zaman VarisZamani(Siparis s);
     void KuryeAta(string varisZamani);
+    void KuryeSiparisVer(Siparis s);
 };
 
 class Menu
@@ -680,6 +682,18 @@ void Yonetici::UrunEkle()
 void Yonetici::KuryeEkle()
 {
     ofstream KuryelerFile("./kuryeler.txt", ios::app);
+    ifstream KuryelerFileRead("./kuryeler.txt");
+
+    int kuryeSayisi = 0;
+
+    string line;
+
+    while (getline(KuryelerFileRead, line))
+    {
+        kuryeSayisi++;
+    }
+
+    int yeniKuryeId = kuryeSayisi + 1;
 
     string adSoyad;
     string telNo;
@@ -690,7 +704,7 @@ void Yonetici::KuryeEkle()
     cout << "Kurye'nin telefon numarasi: " << endl;
     cin >> telNo;
 
-    KuryelerFile << adSoyad << "-" << telNo << endl;
+    KuryelerFile << yeniKuryeId << "-" << adSoyad << "-" << telNo << endl;
 
     KuryelerFile.close();
 }
@@ -1207,6 +1221,7 @@ void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k)
                        << s.get_siparis_fiyat() << "-"
                        << s.get_siparis_baslangic() << "-"
                        << s.get_siparis_ulasim() << endl;
+        kurye.KuryeSiparisVer(s);
 
         if (FaturalarFile.is_open())
         {
@@ -1305,6 +1320,58 @@ Zaman Zaman::operator+(Zaman &obj)
     return *this;
 }
 
+bool Zaman::operator<=(Zaman &obj)
+{
+    int thisTotalMin = this->getSaat() * 60 + this->getDakika();
+    int objTotalMin = obj.getSaat() * 60 + obj.getDakika();
+
+    return thisTotalMin <= objTotalMin;
+}
+
+Zaman Zaman::stringToZaman(string zaman)
+{
+    string Saat = zaman.substr(0, zaman.find(":"));
+    zaman.erase(0, zaman.find(":") + 1);
+    string Dakika = zaman.substr(0, zaman.find("\n"));
+
+    Zaman z;
+
+    string ZamanSaat, ZamanDakika;
+
+    if (Saat.substr(0, 1) == "0")
+    {
+        ZamanSaat = Saat.substr(1, Saat.find("\n"));
+    }
+    else
+    {
+        ZamanSaat = Saat;
+    }
+
+    if (Dakika.substr(0, 1) == "0")
+    {
+        ZamanDakika = Dakika.substr(1, Dakika.find("\n"));
+    }
+    else
+    {
+        ZamanDakika = Dakika;
+    }
+
+    stringstream ss;
+
+    int ZamanSaatInt;
+    int ZamanDakikaInt;
+
+    ZamanSaatInt = stoi(ZamanSaat);
+    ZamanDakikaInt = stoi(ZamanDakika);
+
+    cout << ZamanSaatInt << " " << ZamanDakikaInt << endl;
+
+    z.setSaat(ZamanSaatInt);
+    z.setDakika(ZamanDakikaInt);
+
+    return z;
+}
+
 void Kurye::KuryeAta(string varisZamani)
 {
     ifstream KuryelerFile("./kuryeler.txt");
@@ -1314,7 +1381,7 @@ void Kurye::KuryeAta(string varisZamani)
     string varisZamaniDakika = varisZamani.substr(0, varisZamani.find("\n"));
 
     string line;
-    string ZamanFromFile; 
+    string ZamanFromFile;
     string SaatFromFile;
     string DakikaFromFile;
     string secilenKurye;
@@ -1325,7 +1392,7 @@ void Kurye::KuryeAta(string varisZamani)
             line.erase(0, line.find("-") + 1);
             line.erase(0, line.find("-") + 1);
             ZamanFromFile = line.substr(0, line.find("\n"));
-            
+
             SaatFromFile = ZamanFromFile.substr(0, ZamanFromFile.find(":"));
             ZamanFromFile.erase(0, ZamanFromFile.find(":") + 1);
             DakikaFromFile = ZamanFromFile.substr(0, ZamanFromFile.find("\n"));
@@ -1333,9 +1400,52 @@ void Kurye::KuryeAta(string varisZamani)
             if (SaatFromFile <= varisZamaniSaat)
             {
                 secilenKurye = line;
-            }   
+            }
         }
     }
+}
+
+void Kurye::KuryeSiparisVer(Siparis s)
+{
+    ifstream KuryelerFile("./kuryeler.txt");
+    string KuryeDolu, KuryeBos;
+    string siparisAlacakKuryeId;
+
+    if (KuryelerFile.is_open())
+    {
+        string BosKurye;
+        while (getline(KuryelerFile, KuryeBos))
+        {
+            BosKurye = KuryeBos.substr(KuryeBos.find("/"), KuryeBos.find("\n"));
+            if (BosKurye == "/")
+            {
+                cout << "Bosta Kurye bulundu" << endl;
+                siparisAlacakKuryeId = KuryeBos.substr(0, KuryeBos.find("-"));
+                goto KURYE_SECILDI;
+                break;
+            }
+        }
+
+        string kuryeSonSiparisBitis;
+        Zaman z;
+        Zaman kuryeSonSiparisBitisZaman;
+        Zaman KontrolZamani = z.stringToZaman(z.getCurrentTime());
+        while (getline(KuryelerFile, KuryeDolu))
+        {
+            KuryeDolu.erase(0, KuryeDolu.find("\n") - 5);
+            kuryeSonSiparisBitis = KuryeDolu.substr(0, KuryeDolu.find("\n"));
+            kuryeSonSiparisBitisZaman = z.stringToZaman(kuryeSonSiparisBitis);
+
+            cout << kuryeSonSiparisBitis << endl;
+            if (kuryeSonSiparisBitisZaman <= KontrolZamani)
+            {
+                siparisAlacakKuryeId = KuryeDolu.substr(0, KuryeDolu.find("-"));
+                goto KURYE_SECILDI;
+            }
+        }
+    }
+    KURYE_SECILDI:  
+        cout << "Siparis alacak kurye id: " << siparisAlacakKuryeId << endl;
 }
 
 int main()
