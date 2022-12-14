@@ -1364,8 +1364,6 @@ Zaman Zaman::stringToZaman(string zaman)
     ZamanSaatInt = stoi(ZamanSaat);
     ZamanDakikaInt = stoi(ZamanDakika);
 
-    cout << ZamanSaatInt << " " << ZamanDakikaInt << endl;
-
     z.setSaat(ZamanSaatInt);
     z.setDakika(ZamanDakikaInt);
 
