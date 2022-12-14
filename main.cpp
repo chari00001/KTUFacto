@@ -226,6 +226,9 @@ public:
     Zaman VarisZamani(Siparis s);
     void KuryeAta(string varisZamani);
     void KuryeSiparisVer(Siparis s);
+    string BosKuryeKontrol();
+    string BitmisKuryeKontrol();
+    string IlkKuryeKontrol();
 };
 
 class Menu
@@ -1107,9 +1110,6 @@ Zaman Kurye::VarisZamani(Siparis s)
 
     Zaman varisZamani;
 
-    cout << "Siparis zamani: " << s.get_siparis_baslangic() << endl;
-    cout << "Siparis adresi: " << s.get_siparis_adresi() << endl;
-
     string Konum, sure;
     if (KonumlarFile.is_open())
     {
@@ -1143,9 +1143,6 @@ Zaman Kurye::VarisZamani(Siparis s)
     Zaman siparisSuresi;
     siparisSuresi.setSaat(sureInt / 60);
     siparisSuresi.setDakika(sureInt % 60);
-
-    cout << "Siparis zamani: " << siparisZamani.getSaat() << ":" << siparisZamani.getDakika() << endl;
-    cout << "Siparis sure: " << siparisSuresi.getSaat() << ":" << siparisSuresi.getDakika() << endl;
 
     varisZamani = siparisZamani + siparisSuresi;
 
@@ -1361,8 +1358,8 @@ Zaman Zaman::stringToZaman(string zaman)
     int ZamanSaatInt;
     int ZamanDakikaInt;
 
-    ZamanSaatInt = stoi(ZamanSaat);
-    ZamanDakikaInt = stoi(ZamanDakika);
+    istringstream(ZamanSaat) >> ZamanSaatInt;
+    istringstream(ZamanDakika) >> ZamanDakikaInt;
 
     z.setSaat(ZamanSaatInt);
     z.setDakika(ZamanDakikaInt);
@@ -1405,45 +1402,130 @@ void Kurye::KuryeAta(string varisZamani)
 
 void Kurye::KuryeSiparisVer(Siparis s)
 {
-    ifstream KuryelerFile("./kuryeler.txt");
-    string KuryeDolu, KuryeBos;
     string siparisAlacakKuryeId;
 
-    if (KuryelerFile.is_open())
+    string bosKontrolId = BosKuryeKontrol();
+    string bitmisKontrolId = BitmisKuryeKontrol();
+    string ilkKuryeKontrol = IlkKuryeKontrol();
+
+    if (bosKontrolId != "bulunamadi")
     {
-        string BosKurye;
-        while (getline(KuryelerFile, KuryeBos))
+        cout << "Bos kurye bulundu" << endl;
+        siparisAlacakKuryeId = bosKontrolId;
+    }
+    else if (bitmisKontrolId != "bulunamadi")
+    {
+        cout << "Bitmis kurye bulundu" << endl;
+        siparisAlacakKuryeId = bitmisKontrolId;
+    }
+    else
+    {
+        cout << "En erken isi biten kurye secildi." << endl;
+        siparisAlacakKuryeId = ilkKuryeKontrol;
+    }
+
+    cout << "Siparis alacak kurye id: " << siparisAlacakKuryeId << endl;
+}
+
+string Kurye::BosKuryeKontrol()
+{
+    ifstream KuryelerFile("./kuryeler.txt");
+
+    string Kurye;
+    string BosKurye;
+    string SecilenKuryeId;
+
+    while (getline(KuryelerFile, Kurye))
+    {
+        BosKurye = Kurye.substr(Kurye.find("/"), Kurye.find("\n"));
+        if (BosKurye == "/")
         {
-            BosKurye = KuryeBos.substr(KuryeBos.find("/"), KuryeBos.find("\n"));
-            if (BosKurye == "/")
-            {
-                cout << "Bosta Kurye bulundu" << endl;
-                siparisAlacakKuryeId = KuryeBos.substr(0, KuryeBos.find("-"));
-                goto KURYE_SECILDI;
-                break;
-            }
+            cout << "Bosta Kurye bulundu" << endl;
+            SecilenKuryeId = Kurye.substr(0, Kurye.find("-"));
+            break;
         }
-
-        string kuryeSonSiparisBitis;
-        Zaman z;
-        Zaman kuryeSonSiparisBitisZaman;
-        Zaman KontrolZamani = z.stringToZaman(z.getCurrentTime());
-        while (getline(KuryelerFile, KuryeDolu))
+        else
         {
-            KuryeDolu.erase(0, KuryeDolu.find("\n") - 5);
-            kuryeSonSiparisBitis = KuryeDolu.substr(0, KuryeDolu.find("\n"));
-            kuryeSonSiparisBitisZaman = z.stringToZaman(kuryeSonSiparisBitis);
-
-            cout << kuryeSonSiparisBitis << endl;
-            if (kuryeSonSiparisBitisZaman <= KontrolZamani)
-            {
-                siparisAlacakKuryeId = KuryeDolu.substr(0, KuryeDolu.find("-"));
-                goto KURYE_SECILDI;
-            }
+            SecilenKuryeId = "bulunamadi";
         }
     }
-    KURYE_SECILDI:  
-        cout << "Siparis alacak kurye id: " << siparisAlacakKuryeId << endl;
+
+    KuryelerFile.close();
+
+    return SecilenKuryeId;
+}
+string Kurye::BitmisKuryeKontrol()
+{
+    ifstream KuryelerFile("./kuryeler.txt");
+
+    string SecilenKuryeId;
+    string Kurye;
+
+    string kuryeSonSiparisBitis;
+    Zaman z;
+    Zaman KontrolZamani = z.stringToZaman(z.getCurrentTime());
+    Zaman kuryeSonSiparisBitisZaman;
+    while (getline(KuryelerFile, Kurye))
+    {
+        string tempKurye = Kurye;
+
+        tempKurye.erase(0, tempKurye.length() - 5);
+        kuryeSonSiparisBitis = tempKurye.substr(0, tempKurye.find("\n"));
+        kuryeSonSiparisBitisZaman = z.stringToZaman(kuryeSonSiparisBitis);
+
+        if (kuryeSonSiparisBitisZaman <= KontrolZamani)
+        {
+            SecilenKuryeId = Kurye.substr(0, Kurye.find("-"));
+            break;
+        }
+        else
+        {
+            SecilenKuryeId = "bulunamadi";
+        }
+    }
+
+    KuryelerFile.close();
+
+    return SecilenKuryeId;
+}
+string Kurye::IlkKuryeKontrol()
+{
+    ifstream KuryelerFile("./kuryeler.txt");
+
+    string SecilenKuryeId;
+    string Kurye;
+
+    Zaman EnErkenBitisZamani;
+    EnErkenBitisZamani.setSaat(23);
+    EnErkenBitisZamani.setDakika(59);
+
+    Zaman z;
+    string kuryeSonSiparisBitis; 
+    Zaman kuryeSonSiparisBitisZaman;
+    while (getline(KuryelerFile, Kurye))
+    {
+        string tempKurye = Kurye;
+
+        tempKurye.erase(0, tempKurye.length() - 5);
+        kuryeSonSiparisBitis = tempKurye.substr(0, tempKurye.find("\n"));
+        kuryeSonSiparisBitisZaman = z.stringToZaman(kuryeSonSiparisBitis);
+
+        if (kuryeSonSiparisBitisZaman <= EnErkenBitisZamani)
+        {
+            EnErkenBitisZamani.setSaat(kuryeSonSiparisBitisZaman.getSaat());
+            EnErkenBitisZamani.setDakika(kuryeSonSiparisBitisZaman.getDakika());
+
+            SecilenKuryeId = Kurye.substr(0, Kurye.find("-"));
+            cout << "Kurye id: " << SecilenKuryeId << endl;
+            EnErkenBitisZamani.printZaman();
+        }
+    }
+
+    cout << "Secilen kurye id: " << SecilenKuryeId << endl;
+
+    KuryelerFile.close();
+
+    return SecilenKuryeId;
 }
 
 int main()
