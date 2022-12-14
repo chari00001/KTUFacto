@@ -601,15 +601,12 @@ bool Kullanici::sifreKontrol(string sifre)
 
             if (sayac < 4)
             {
-
                 return false;
             }
 
             else
             {
-
                 kontrol = true;
-
                 return true;
             }
         }
@@ -617,7 +614,7 @@ bool Kullanici::sifreKontrol(string sifre)
 }
 
 bool Kullanici::kullaniciAdiKontrol(string kullanici_adi)
-{ //!!!!!!!!!!!!!!!  DUZELTILECEK KISIM  !!!!!!!!!!!!!!!//
+{
     Hatalar hata;
     regex kullanici_ad_exp{"^[a-z_0-9]+$"};
 
@@ -786,7 +783,7 @@ void Menu::MenuBaslat()
     cout << "1 - Sisteme giris\n2 - Uye kaydi\n3 - Cikis"
          << endl;
     cin >> opsiyon1;
-    system("clear"); // system("cls") - windows
+    system("clear");
 
     switch (opsiyon1)
     {
@@ -1500,7 +1497,7 @@ string Kurye::IlkKuryeKontrol()
     EnErkenBitisZamani.setDakika(59);
 
     Zaman z;
-    string kuryeSonSiparisBitis; 
+    string kuryeSonSiparisBitis;
     Zaman kuryeSonSiparisBitisZaman;
     while (getline(KuryelerFile, Kurye))
     {
