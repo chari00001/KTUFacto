@@ -5,3 +5,5 @@ B-UrunB2-120-M,L,XL,XXL-Sari,Turuncu
 C-UrunC1-160-S,XS-Mor,Mavi
 C-UrunC2-170-S,XS,XXS-Siyah,Beyaz
 A-UrunA3-180-XXS,XS,S,M,L-Beyaz,Sari
+E-UrunE1-800-XL,XXL,XXS,M-Mavi,Kirmizi,Pembe
+E-UrunE2-700-L,M,S-Mor,Siyah

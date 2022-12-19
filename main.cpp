@@ -97,9 +97,15 @@ private:
     string indirimKodu;
     string dTarihi;
     string sepet;
+    double sepetTutari;
 
 public:
-    Kullanici(string KullaniciAdi = "") { setKullaniciAdi(KullaniciAdi); }
+    Kullanici(string KullaniciAdi = "", string Sepet = "", double SepetTutari = 0.0)
+    {
+        setKullaniciAdi(KullaniciAdi);
+        setSepet(Sepet);
+        setSepetTutari(SepetTutari);
+    }
 
     void setKullaniciAdi(string kullaniciAdi) { this->kullaniciAdi = kullaniciAdi; }
     void setEposta(string ePosta) { this->ePosta = ePosta; }
@@ -108,6 +114,7 @@ public:
     void setIndirimKodu(string indirimKodu) { this->indirimKodu = indirimKodu; }
     void setDTarihi(string dTarihi) { this->dTarihi = dTarihi; }
     void setSepet(string sepet) { this->sepet = sepet; }
+    void setSepetTutari(double sepetTutari) { this->sepetTutari = sepetTutari; }
 
     string getKullaniciAdi() { return kullaniciAdi; }
     string getEposta() { return ePosta; }
@@ -116,6 +123,7 @@ public:
     string getIndirimKodu() { return indirimKodu; }
     string getDTarihi() { return dTarihi; }
     string getSepet() { return sepet; }
+    double getSepetTutari() { return sepetTutari; }
 
     void SikayetYaz();
     void SifreDegistir();
@@ -147,20 +155,20 @@ public:
 class Kiyafet
 {
 private:
-    double fiyat;
+    int fiyat;
     string kategori;
     string kiyafet_adi;
     string boyut;
     string renk;
 
 public:
-    void set_fiyat(double fiyat) { this->fiyat = fiyat; }
+    void set_fiyat(int fiyat) { this->fiyat = fiyat; }
     void set_kategori(string kategori) { this->kategori = kategori; }
     void set_kiyafet_adi(string kiyafet_adi) { this->kiyafet_adi = kiyafet_adi; }
     void set_boyut(string boyut) { this->boyut = boyut; }
     void set_renk(string renk) { this->renk = renk; }
 
-    double get_fiyat() { return fiyat; }
+    int get_fiyat() { return fiyat; }
     string get_kategori() { return kategori; }
     string get_kiyafet_adi() { return kiyafet_adi; }
     string get_boyut() { return boyut; }
@@ -729,7 +737,7 @@ void Yonetici::KuryeEkle()
     cout << "Kurye'nin telefon numarasi: " << endl;
     cin >> telNo;
 
-    KuryelerFile << yeniKuryeId << "-" << adSoyad << "-" << telNo << endl;
+    KuryelerFile << yeniKuryeId << "-" << adSoyad << "-" << telNo << "/" << endl;
 
     KuryelerFile.close();
 }
@@ -1134,6 +1142,7 @@ MENU:
     ofstream SiparislerFile("./siparisler.txt", ios::app);
     ofstream FaturalarFile("./faturalar.txt", ios::app);
     string sepet = "";
+    int sepetTutari = 0;
     string urun = urunler.getElement(urunIndex);
 
     // Urun Fiyat
@@ -1209,37 +1218,46 @@ MENU:
     kiyafet.set_kiyafet_adi(urun.substr(0, urun.find("-")));
     urun.erase(0, urun.find("-") + 1);
 
-    double urunFiyat;
+    int urunFiyat;
     istringstream(urun.substr(0, urun.find("-"))) >> urunFiyat;
     kiyafet.set_fiyat(urunFiyat);
     urun.erase(0, urun.find("-") + 1);
     kiyafet.set_boyut(secilenBeden);
     kiyafet.set_renk(secilenRenk);
 
-    k.setSepet(kiyafet.get_kategori() + "-" +
+    // Siparis Fiyat
+    double siparisFiyat = adet * priceFromLineInt;
+
+    k.setSepet(k.getSepet() + "," + kiyafet.get_kategori() + "-" +
                kiyafet.get_kiyafet_adi() + "-" +
                to_string(kiyafet.get_fiyat()) + "-" +
                kiyafet.get_boyut() + "-" +
                kiyafet.get_renk());
 
-    // Siparis Fiyat
-    int siparisFiyat = adet * priceFromLineInt;
+    k.setSepetTutari(k.getSepetTutari() + siparisFiyat);
 
-ALISVERIS_DEVAM:
     string alisverisDevam;
     cout << "Alisverise devam etmek ister misiniz? (e/h)" << endl;
     cin >> alisverisDevam;
 
     if (alisverisDevam == "e")
     {
-        KategorileriListele();
+        SinglyLinkedList categories = KategorileriListele();
+        int categoryCount = categories.print();
+
+        string categorySelection;
+        cout << "Kategori seciniz (Tum kategoriler icin 0 yaziniz): " << endl;
+        getline(cin >> ws, categorySelection);
+
+        system("clear");
+        UrunleriListele(categorySelection, k);
     }
     else if (alisverisDevam == "h")
     {
         // Siparis SiparisNo
         int siparisNo = rand() % 9999999 + 1000000;
 
-        Siparis s(k.getKullaniciAdi(), k.getAdres(), k.getSepet(), to_string(siparisNo), siparisFiyat, z.getCurrentTime());
+        Siparis s(k.getKullaniciAdi(), k.getAdres(), k.getSepet(), to_string(siparisNo), k.getSepetTutari(), z.getCurrentTime());
         s.set_siparis_ulasim(kurye.VarisZamaniHesapla(s, kurye.KuryeSec(s)));
 
         if (SiparislerFile.is_open())
@@ -1272,11 +1290,6 @@ ALISVERIS_DEVAM:
         {
             cout << "Boyle bir dosya bulunamadi..." << endl;
         }
-    }
-    else
-    {
-        cout << "Yanlis secim;" << endl;
-        goto ALISVERIS_DEVAM;
     }
 
     FaturalarFile.close();
@@ -1544,21 +1557,16 @@ string Kurye::KuryeSec(Siparis s)
 
     if (bosKontrolId != "bulunamadi")
     {
-        cout << "Bos kurye bulundu" << endl;
         siparisAlacakKuryeId = bosKontrolId;
     }
     else if (bitmisKontrolId != "bulunamadi")
     {
-        cout << "Bitmis kurye bulundu" << endl;
         siparisAlacakKuryeId = bitmisKontrolId;
     }
     else
     {
-        cout << "En erken isi biten kurye secildi." << endl;
         siparisAlacakKuryeId = ilkKuryeKontrol;
     }
-
-    // cout << "Siparis alacak kurye id: " << siparisAlacakKuryeId << endl;
 
     return siparisAlacakKuryeId;
 }
@@ -1578,7 +1586,6 @@ string Kurye::BosKuryeKontrol()
         BosKurye = Kurye.substr(Kurye.find("/"), Kurye.find("\n"));
         if (BosKurye == "/")
         {
-            cout << "Bosta Kurye bulundu" << endl;
             SecilenKuryeId = Kurye.substr(0, Kurye.find("-"));
             Kontrol = true;
             break;
@@ -1655,12 +1662,8 @@ string Kurye::IlkKuryeKontrol()
             EnErkenBitisZamani.setDakika(kuryeSonSiparisBitisZaman.getDakika());
 
             SecilenKuryeId = Kurye.substr(0, Kurye.find("-"));
-            cout << "Kurye id: " << SecilenKuryeId << endl;
-            EnErkenBitisZamani.printZaman();
         }
     }
-
-    cout << "Secilen kurye id: " << SecilenKuryeId << endl;
 
     KuryelerFile.close();
 
