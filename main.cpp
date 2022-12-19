@@ -96,6 +96,7 @@ private:
     string sifre; // sorun sifre nasil store edilir bakin!!!!!!! openssl kutuphanesine bakilsin
     string indirimKodu;
     string dTarihi;
+    string sepet;
 
 public:
     Kullanici(string KullaniciAdi = "") { setKullaniciAdi(KullaniciAdi); }
@@ -106,6 +107,7 @@ public:
     void setSifre(string sifre) { this->sifre = sifre; }
     void setIndirimKodu(string indirimKodu) { this->indirimKodu = indirimKodu; }
     void setDTarihi(string dTarihi) { this->dTarihi = dTarihi; }
+    void setSepet(string sepet) { this->sepet = sepet; }
 
     string getKullaniciAdi() { return kullaniciAdi; }
     string getEposta() { return ePosta; }
@@ -113,6 +115,7 @@ public:
     string getSifre() { return sifre; }
     string getIndirimKodu() { return indirimKodu; }
     string getDTarihi() { return dTarihi; }
+    string getSepet() { return sepet; }
 
     void SikayetYaz();
     void SifreDegistir();
@@ -1123,106 +1126,14 @@ void Menu::UrunleriListele(string Selection, Kullanici k)
     }
 }
 
-Zaman Kurye::VarisZamani(Siparis s, string kuryeId)
-{
-    ifstream KonumlarFile("./konumlar.txt");
-    ifstream KuryelerFile("./kuryeler.txt");
-
-    string SecilenKurye;
-    string Kurye;
-
-    if (KuryelerFile.is_open())
-    {
-        while (getline(KuryelerFile, Kurye))
-        {
-            if (Kurye.substr(0, Kurye.find("-")) == kuryeId)
-            {
-                SecilenKurye = Kurye;
-            }
-        }
-    }
-
-    Zaman z;
-    string SecilenKuryeSaat = SecilenKurye.substr(SecilenKurye.length() - 5, SecilenKurye.length());
-    Zaman SecilenKuryeZaman = z.stringToZaman(SecilenKuryeSaat);
-
-    bool BosKontrol = SecilenKuryeSaat.find("/") != string::npos;
-
-    Zaman varisZamani;
-
-    string Konum, sure;
-    if (KonumlarFile.is_open())
-    {
-        while (getline(KonumlarFile, Konum))
-        {
-            if (Konum.substr(0, Konum.find("-")) == s.get_siparis_adresi())
-            {
-                Konum.erase(0, Konum.find("-") + 1);
-                sure = Konum.substr(0, Konum.find("-"));
-            }
-        }
-    }
-
-    int sureInt;
-    istringstream(sure) >> sureInt;
-
-    string siparisBaslangic = s.get_siparis_baslangic();
-
-    string siparisSaati = siparisBaslangic.substr(0, siparisBaslangic.find(":"));
-    siparisBaslangic.erase(0, siparisBaslangic.find(":") + 1);
-    string siparisDakikasi = siparisBaslangic.substr(0, siparisBaslangic.find("-"));
-
-    int siparisSaatiInt, siparisDakikasiInt;
-    istringstream(siparisSaati) >> siparisSaatiInt;
-    istringstream(siparisDakikasi) >> siparisDakikasiInt;
-
-    Zaman siparisZamani;
-    siparisZamani.setSaat(siparisSaatiInt);
-    siparisZamani.setDakika(siparisDakikasiInt);
-
-    Zaman siparisSuresi;
-    siparisSuresi.setSaat(sureInt / 60);
-    siparisSuresi.setDakika(sureInt % 60);
-
-    if (!BosKontrol && siparisZamani <= SecilenKuryeZaman)
-    {
-        siparisZamani.setSaat(SecilenKuryeZaman.getSaat());
-        siparisZamani.setDakika(SecilenKuryeZaman.getDakika());
-    }
-
-    varisZamani = siparisZamani + siparisSuresi;
-
-    return varisZamani;
-}
-
-string Kurye::VarisZamaniHesapla(Siparis s, string kuryeId)
-{
-    Zaman varisZamani = VarisZamani(s, kuryeId);
-
-    string varisZamaniString;
-    stringstream ss;
-
-    string varisZamaniSaat = to_string(varisZamani.getSaat());
-    string varisZamaniDakika = to_string(varisZamani.getDakika());
-
-    if (varisZamaniSaat.length() == 1)
-    {
-        varisZamaniSaat = "0" + varisZamaniSaat;
-    }
-    if (varisZamaniDakika.length() == 1)
-    {
-        varisZamaniDakika = "0" + varisZamaniDakika;
-    }
-
-    return varisZamaniSaat + ":" + varisZamaniDakika;
-}
-
 void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k)
 {
+MENU:
     Zaman z;
     Kurye kurye;
     ofstream SiparislerFile("./siparisler.txt", ios::app);
     ofstream FaturalarFile("./faturalar.txt", ios::app);
+    string sepet = "";
     string urun = urunler.getElement(urunIndex);
 
     // Urun Fiyat
@@ -1236,8 +1147,6 @@ void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k)
     ss << priceFromLine;
     ss >> priceFromLineInt;
 
-    cout << priceFromLine;
-
     cout << "Secilen urun: " << endl;
     cout << urun << endl;
 
@@ -1246,35 +1155,118 @@ void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k)
     cout << "Adet giriniz: " << endl;
     cin >> adet;
 
-    // Siparis SiparisNo
-    int siparisNo = rand() % 9999999 + 1000000;
+    // Siparis Beden
+    bool bedenKontrol = false;
+    bool renkKontrol = false;
+
+    string secilenBeden;
+    string secilenRenk;
+
+    while (!bedenKontrol)
+    {
+        cout << "Beden giriniz: " << endl;
+        getline(cin >> ws, secilenBeden);
+        // cout << "Geri donmek icin 1'e basiniz" << endl;
+        if (urun.find(secilenBeden) != string::npos)
+        {
+            bedenKontrol = true;
+        }
+        // else if (secilenBeden == "1")
+        // {
+        //     goto MENU;
+        // }
+
+        else
+        {
+            cout << "Bu beden mevcut degil..." << endl;
+        }
+    }
+
+    while (!renkKontrol)
+    {
+        cout << "Renk giriniz: " << endl;
+        getline(cin >> ws, secilenRenk);
+        // cout << "Geri donmek icin 1'e basiniz" << endl;
+        if (urun.find(secilenRenk) != string::npos)
+        {
+            renkKontrol = true;
+        }
+        // else if (secilenRenk == "1")
+        // {
+        //     goto MENU;
+        // }
+
+        else
+        {
+            cout << "Bu renk mevcut degil..." << endl;
+        }
+    }
+
+    Kiyafet kiyafet;
+
+    kiyafet.set_kategori(urun.substr(0, urun.find("-")));
+    urun.erase(0, urun.find("-") + 1);
+    kiyafet.set_kiyafet_adi(urun.substr(0, urun.find("-")));
+    urun.erase(0, urun.find("-") + 1);
+
+    double urunFiyat;
+    istringstream(urun.substr(0, urun.find("-"))) >> urunFiyat;
+    kiyafet.set_fiyat(urunFiyat);
+    urun.erase(0, urun.find("-") + 1);
+    kiyafet.set_boyut(secilenBeden);
+    kiyafet.set_renk(secilenRenk);
+
+    k.setSepet(kiyafet.get_kategori() + "-" +
+               kiyafet.get_kiyafet_adi() + "-" +
+               to_string(kiyafet.get_fiyat()) + "-" +
+               kiyafet.get_boyut() + "-" +
+               kiyafet.get_renk());
 
     // Siparis Fiyat
     int siparisFiyat = adet * priceFromLineInt;
 
-    Siparis s(k.getKullaniciAdi(), k.getAdres(), urun, to_string(siparisNo), siparisFiyat, z.getCurrentTime());
-    s.set_siparis_ulasim(kurye.VarisZamaniHesapla(s, kurye.KuryeSec(s)));
+ALISVERIS_DEVAM:
+    string alisverisDevam;
+    cout << "Alisverise devam etmek ister misiniz? (e/h)" << endl;
+    cin >> alisverisDevam;
 
-    if (SiparislerFile.is_open())
+    if (alisverisDevam == "e")
     {
-        SiparislerFile << s.get_kullanici_adi() << "-"
-                       << s.get_siparis_adresi() << "-"
-                       << s.get_urun_bilgisi() << "-"
-                       << s.get_siparis_no() << "-"
-                       << s.get_siparis_fiyat() << "-"
-                       << s.get_siparis_baslangic() << "-"
-                       << s.get_siparis_ulasim() << endl;
+        KategorileriListele();
+    }
+    else if (alisverisDevam == "h")
+    {
+        // Siparis SiparisNo
+        int siparisNo = rand() % 9999999 + 1000000;
 
-        kurye.KuryeSiparisVer(kurye.KuryeSec(s), s);
+        Siparis s(k.getKullaniciAdi(), k.getAdres(), k.getSepet(), to_string(siparisNo), siparisFiyat, z.getCurrentTime());
+        s.set_siparis_ulasim(kurye.VarisZamaniHesapla(s, kurye.KuryeSec(s)));
 
-        if (FaturalarFile.is_open())
+        if (SiparislerFile.is_open())
         {
-            FaturalarFile << s.get_kullanici_adi() << "-"
-                          << s.get_siparis_adresi() << "-"
-                          << s.get_urun_bilgisi() << "-"
-                          << s.get_siparis_no() << "-"
-                          << s.get_siparis_fiyat() << "-"
-                          << s.get_siparis_baslangic() << endl;
+            SiparislerFile << s.get_kullanici_adi() << "-"
+                           << s.get_siparis_adresi() << "-"
+                           << s.get_urun_bilgisi() << "-"
+                           << s.get_siparis_no() << "-"
+                           << s.get_siparis_fiyat() << "-"
+                           << s.get_siparis_baslangic() << "-"
+                           << s.get_siparis_ulasim() << endl;
+
+            kurye.KuryeSiparisVer(kurye.KuryeSec(s), s);
+
+            if (FaturalarFile.is_open())
+            {
+                FaturalarFile << s.get_kullanici_adi() << "-"
+                              << s.get_siparis_adresi() << "-"
+                              << s.get_urun_bilgisi() << "-"
+                              << s.get_siparis_no() << "-"
+                              << s.get_siparis_fiyat() << "-"
+                              << s.get_siparis_baslangic() << endl;
+            }
+            else
+            {
+                cout << "Boyle bir dosya bulunamadi..." << endl;
+            }
         }
         else
         {
@@ -1283,7 +1275,8 @@ void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k)
     }
     else
     {
-        cout << "Boyle bir dosya bulunamadi..." << endl;
+        cout << "Yanlis secim;" << endl;
+        goto ALISVERIS_DEVAM;
     }
 
     FaturalarFile.close();
@@ -1412,6 +1405,100 @@ Zaman Zaman::stringToZaman(string zaman)
     z.setDakika(ZamanDakikaInt);
 
     return z;
+}
+
+Zaman Kurye::VarisZamani(Siparis s, string kuryeId)
+{
+    ifstream KonumlarFile("./konumlar.txt");
+    ifstream KuryelerFile("./kuryeler.txt");
+
+    string SecilenKurye;
+    string Kurye;
+
+    if (KuryelerFile.is_open())
+    {
+        while (getline(KuryelerFile, Kurye))
+        {
+            if (Kurye.substr(0, Kurye.find("-")) == kuryeId)
+            {
+                SecilenKurye = Kurye;
+            }
+        }
+    }
+
+    Zaman z;
+    string SecilenKuryeSaat = SecilenKurye.substr(SecilenKurye.length() - 5, SecilenKurye.length());
+    Zaman SecilenKuryeZaman = z.stringToZaman(SecilenKuryeSaat);
+
+    bool BosKontrol = SecilenKuryeSaat.find("/") != string::npos;
+
+    Zaman varisZamani;
+
+    string Konum, sure;
+    if (KonumlarFile.is_open())
+    {
+        while (getline(KonumlarFile, Konum))
+        {
+            if (Konum.substr(0, Konum.find("-")) == s.get_siparis_adresi())
+            {
+                Konum.erase(0, Konum.find("-") + 1);
+                sure = Konum.substr(0, Konum.find("-"));
+            }
+        }
+    }
+
+    int sureInt;
+    istringstream(sure) >> sureInt;
+
+    string siparisBaslangic = s.get_siparis_baslangic();
+
+    string siparisSaati = siparisBaslangic.substr(0, siparisBaslangic.find(":"));
+    siparisBaslangic.erase(0, siparisBaslangic.find(":") + 1);
+    string siparisDakikasi = siparisBaslangic.substr(0, siparisBaslangic.find("-"));
+
+    int siparisSaatiInt, siparisDakikasiInt;
+    istringstream(siparisSaati) >> siparisSaatiInt;
+    istringstream(siparisDakikasi) >> siparisDakikasiInt;
+
+    Zaman siparisZamani;
+    siparisZamani.setSaat(siparisSaatiInt);
+    siparisZamani.setDakika(siparisDakikasiInt);
+
+    Zaman siparisSuresi;
+    siparisSuresi.setSaat(sureInt / 60);
+    siparisSuresi.setDakika(sureInt % 60);
+
+    if (!BosKontrol && siparisZamani <= SecilenKuryeZaman)
+    {
+        siparisZamani.setSaat(SecilenKuryeZaman.getSaat());
+        siparisZamani.setDakika(SecilenKuryeZaman.getDakika());
+    }
+
+    varisZamani = siparisZamani + siparisSuresi;
+
+    return varisZamani;
+}
+
+string Kurye::VarisZamaniHesapla(Siparis s, string kuryeId)
+{
+    Zaman varisZamani = VarisZamani(s, kuryeId);
+
+    string varisZamaniString;
+    stringstream ss;
+
+    string varisZamaniSaat = to_string(varisZamani.getSaat());
+    string varisZamaniDakika = to_string(varisZamani.getDakika());
+
+    if (varisZamaniSaat.length() == 1)
+    {
+        varisZamaniSaat = "0" + varisZamaniSaat;
+    }
+    if (varisZamaniDakika.length() == 1)
+    {
+        varisZamaniDakika = "0" + varisZamaniDakika;
+    }
+
+    return varisZamaniSaat + ":" + varisZamaniDakika;
 }
 
 void Kurye::KuryeAta(string varisZamani)
@@ -1582,11 +1669,6 @@ string Kurye::IlkKuryeKontrol()
 
 void Kurye::KuryeSiparisVer(string id, Siparis s)
 {
-    // Update the kurye which has the id of the parameter, with the new bitis time
-    // use vectors to store the lines of the file
-    // then update the line with the id of the parameter
-    // then write the vector to the file
-
     ifstream KuryelerFile("./kuryeler.txt");
     vector<string> Kuryeler;
 

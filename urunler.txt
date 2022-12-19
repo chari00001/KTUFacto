@@ -1,7 +1,7 @@
-A-UrunA1-100-XL-Mavi
-A-UrunA2-150-XXL-Kirmizi
-B-UrunB1-130-L-Yesil
-B-UrunB2-120-M-Sari
-C-UrunC1-160-S-Mor
-C-UrunC2-170-XS-Siyah
-A-UrunA3-180-XXS-Beyaz
+A-UrunA1-100-XL,XXL,M-Mavi,Yesil,Kirmizi
+A-UrunA2-150-XXL,XL-Kirmizi,Pembe,Siyah
+B-UrunB1-130-S,M,L-Yesil,Beyaz
+B-UrunB2-120-M,L,XL,XXL-Sari,Turuncu
+C-UrunC1-160-S,XS-Mor,Mavi
+C-UrunC2-170-S,XS,XXS-Siyah,Beyaz
+A-UrunA3-180-XXS,XS,S,M,L-Beyaz,Sari
