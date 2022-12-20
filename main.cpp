@@ -69,6 +69,7 @@ public:
     string getCurrentDate();
     string getCurrentTime();
     Zaman operator+(Zaman &obj);
+    Zaman operator-(Zaman &obj);
     bool operator<=(Zaman &obj);
     void printZaman();
     Zaman stringToZaman(string zaman);
@@ -701,11 +702,50 @@ void Kullanici::SiparisTakip()
     int index = 1;
     if (SiparislerFile.is_open())
     {
+        Zaman z;
+        string siparisBitis;
+        Zaman siparisBitisZaman;
+        string varisZamaniString;
+        Zaman varisZamani;
+        Zaman simdikiZaman = z.stringToZaman(z.getCurrentTime());
         while (getline(SiparislerFile, Siparis))
         {
             if (Siparis.substr(0, Siparis.find("-")) == getKullaniciAdi())
             {
-                cout << index << " - " << Siparis << endl;
+                string tempSiparis = Siparis;
+
+                // Kullanici adi ve adres silme
+                tempSiparis.erase(0, tempSiparis.find(">") + 2);
+
+                string siparisBilgisiDosya = tempSiparis.substr(0, tempSiparis.find(" "));
+                tempSiparis.erase(0, tempSiparis.find(" ") + 2);
+                string siparisNoDosya = tempSiparis.substr(0, tempSiparis.find("-"));
+                tempSiparis.erase(0, tempSiparis.find("-") + 1);
+                string toplamFiyatDosya = tempSiparis.substr(0, tempSiparis.find("-")) + " TL";
+                tempSiparis.erase(0, tempSiparis.find("-") + 1);
+                string siparisZamaniDosya = tempSiparis.substr(0, tempSiparis.find("-"));
+
+                siparisBitis = Siparis.substr(Siparis.length() - 5, Siparis.length());
+                siparisBitisZaman = z.stringToZaman(siparisBitis);
+
+                if (siparisBitisZaman <= simdikiZaman)
+                {
+                    varisZamaniString = "Teslim edildi.";
+                }
+                else
+                {
+                    varisZamani = siparisBitisZaman - simdikiZaman;
+                    varisZamaniString = "Teslimata " + to_string(varisZamani.getSaat() * 60 + varisZamani.getDakika()) + " Dakika kaldi.";
+                }
+
+                cout << index << " - "
+                     << "\n"
+                     << "Siparis Bilgisi: " << siparisBilgisiDosya << "\n"
+                     << "Siparis Numarasi: " << siparisNoDosya << "\n"
+                     << "Siparis Tutari: " << toplamFiyatDosya << "\n"
+                     << "Siparis Zamani: " << siparisZamaniDosya << "\n"
+                     << "Siparis Durumu: " << varisZamaniString << "\n"
+                     << endl;
                 index++;
             }
         }
@@ -812,6 +852,7 @@ void Yonetici::FaturaOku()
 
 void Menu::MenuBaslat()
 {
+ANA_MENU:
     int opsiyon1, opsiyon2;
     cout << "1 - Sisteme giris\n2 - Uye kaydi\n3 - Cikis"
          << endl;
@@ -859,6 +900,8 @@ void Menu::MenuBaslat()
         exit;
     }
     default:
+        cout << "Yanlis Secim..." << endl;
+        goto ANA_MENU;
         break;
     }
 }
@@ -872,12 +915,12 @@ void Menu::YoneticiGiris()
     AdminFile >> sifre;
     AdminFile.close();
 
-YONETICI_MENU:
     cout << "Admin sifrenizi giriniz:" << endl;
     cin >> girilenSifre;
     system("clear");
     if (sifre == girilenSifre)
     {
+    YONETICI_MENU:
         cout << "1 - Urun ekle\n2 - Kurye ekle\n3 - Sikayet ve Oneriler\n4 - Indirim kodu tanimla\n5 - Siparis Faturalari" << endl;
         int AdminOpsiyon;
         cin >> AdminOpsiyon;
@@ -1171,20 +1214,25 @@ MENU:
     string secilenBeden;
     string secilenRenk;
 
+    string beden = urun;
+
+    beden.erase(0, beden.find("-") + 1);
+    beden.erase(0, beden.find("-") + 1);
+    string urunRenkleri = beden.substr(0, beden.find("\n"));
+    urunRenkleri.erase(0, urunRenkleri.find("-") + 1);
+    urunRenkleri.erase(0, urunRenkleri.find("-") + 1);
+    beden.erase(0, beden.find("-") + 1);
+
+    beden = beden.substr(0, urun.find("-"));
+
     while (!bedenKontrol)
     {
         cout << "Beden giriniz: " << endl;
         getline(cin >> ws, secilenBeden);
-        // cout << "Geri donmek icin 1'e basiniz" << endl;
-        if (urun.find(secilenBeden) != string::npos)
+        if (beden.find(secilenBeden) != string::npos && secilenBeden != ",")
         {
             bedenKontrol = true;
         }
-        // else if (secilenBeden == "1")
-        // {
-        //     goto MENU;
-        // }
-
         else
         {
             cout << "Bu beden mevcut degil..." << endl;
@@ -1195,16 +1243,10 @@ MENU:
     {
         cout << "Renk giriniz: " << endl;
         getline(cin >> ws, secilenRenk);
-        // cout << "Geri donmek icin 1'e basiniz" << endl;
-        if (urun.find(secilenRenk) != string::npos)
+        if (urunRenkleri.find(secilenRenk) != string::npos && secilenBeden != ",")
         {
             renkKontrol = true;
         }
-        // else if (secilenRenk == "1")
-        // {
-        //     goto MENU;
-        // }
-
         else
         {
             cout << "Bu renk mevcut degil..." << endl;
@@ -1236,6 +1278,27 @@ MENU:
 
     k.setSepetTutari(k.getSepetTutari() + siparisFiyat);
 
+    int sepetTutari = k.getSepetTutari();
+
+    ifstream IndirimlerDosya("./indirimler.txt");
+
+    string Indirim;
+    string IndirimKodu;
+    string IndirimMiktari;
+    int IndirimMiktariInt;
+    while (getline(IndirimlerDosya, Indirim))
+    {
+        if (Indirim.substr(0, Indirim.find(" ")) == k.getIndirimKodu())
+        {
+            IndirimMiktari = Indirim.substr(Indirim.find(" "), Indirim.length());
+            istringstream(IndirimMiktari) >> IndirimMiktariInt;
+            sepetTutari = sepetTutari - ((sepetTutari * IndirimMiktariInt) / 100);
+            cout << k.getIndirimKodu() << " Kodu uygulandi." << endl;
+        }
+        
+    }
+    
+
     string alisverisDevam;
     cout << "Alisverise devam etmek ister misiniz? (e/h)" << endl;
     cin >> alisverisDevam;
@@ -1257,7 +1320,7 @@ MENU:
         // Siparis SiparisNo
         int siparisNo = rand() % 9999999 + 1000000;
 
-        Siparis s(k.getKullaniciAdi(), k.getAdres(), k.getSepet(), to_string(siparisNo), k.getSepetTutari(), z.getCurrentTime());
+        Siparis s(k.getKullaniciAdi(), k.getAdres(), ">" + k.getSepet() + " ", to_string(siparisNo), sepetTutari, z.getCurrentTime());
         s.set_siparis_ulasim(kurye.VarisZamaniHesapla(s, kurye.KuryeSec(s)));
 
         if (SiparislerFile.is_open())
@@ -1366,6 +1429,23 @@ Zaman Zaman::operator+(Zaman &obj)
     {
         this->saat = this->saat + obj.saat;
     }
+
+    return *this;
+}
+
+Zaman Zaman::operator-(Zaman &obj)
+{
+    if (this->dakika - obj.dakika < 0)
+    {
+        this->saat -= 1;
+        this->dakika = (this->dakika + 60) - obj.dakika;
+    }
+    else
+    {
+        this->dakika = this->dakika - obj.dakika;
+    }
+
+    this->saat = this->saat - obj.saat;
 
     return *this;
 }
@@ -1721,6 +1801,4 @@ int main()
 
     Menu m;
     m.MenuBaslat();
-
-    cout << "\n\n\n";
 }

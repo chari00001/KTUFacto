@@ -1,6 +1,9 @@
-chari00001-Ortahisar-A-UrunA1-100-XL-Mavi-4153989-100-21:55-22:30
-chari00001-Ortahisar-A-UrunA1-100-XL-Mavi-1928481-100-22:14-22:49
-chari00001-Ortahisar-A-UrunA1-100-XL-Mavi-5949032-100-07:47-09:20
-chari00001-Ortahisar-,A-UrunA1-100-XXL-Mavi,E-UrunE2-700-L-Mor-10774576-800-23:44-00:19
-chari00001-Ortahisar-,A-UrunA1-100-XL-Yesil-4879211-100-23:47-00:22
-chari00001-Ortahisar-,A-UrunA1-100-XXL-Yesil,A-UrunA1-100-M-Mavi-7570590-200-23:49-00:24
+chari00001-Ortahisar->,A-UrunA1-100-XL-Mavi -4153989-100-21:55-22:30
+chari00001-Ortahisar->,A-UrunA1-100-XL-Mavi -1928481-100-22:14-22:49
+chari00001-Ortahisar->,A-UrunA1-100-XL-Mavi -5949032-100-07:47-09:20
+chari00001-Ortahisar->,A-UrunA1-100-XXL-Mavi,E-UrunE2-700-L-Mor -10774576-800-23:44-00:19
+chari00001-Ortahisar->,A-UrunA1-100-XL-Yesil -4879211-100-23:47-00:22
+chari00001-Ortahisar->,A-UrunA1-100-XXL-Yesil,A-UrunA1-100-M-Mavi -7570590-200-23:49-00:24
+chari00001-Ortahisar->,A-UrunA1-100-XL-Mavi,C-UrunC2-170-XS-Siyah -4877582-610-22:38-23:13
+chari00001-Ortahisar->,A-UrunA1-100-XL-Mavi,E-UrunE2-700-S-Mor -5280192-800-22:49-23:24
+chari00001-Ortahisar->,A-UrunA1-100-M-Mavi,E-UrunE2-700-L-Mor,C-UrunC2-170-XXS-Beyaz -8746248-1670-22:59-23:34
