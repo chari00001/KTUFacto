@@ -801,9 +801,22 @@ void Yonetici::SikayetOku()
 }
 void Yonetici::IndirimKoduEkle()
 {
-    ofstream IndirimlerFile("./indirimler.txt", ios::app);
+    ofstream IndirimlerDosya("./indirimler.txt", ios::app);
+    ifstream KullanicilarDosya("./kullanicilar.txt");
     string kod;
+    string kullaniciAdi;
+    string dosyaKullaniciAdi;
     int indirim;
+
+    cout << "Kullanicilar: " << endl;
+
+    while (getline(KullanicilarDosya, dosyaKullaniciAdi))
+    {
+        cout << dosyaKullaniciAdi.substr(0, dosyaKullaniciAdi.find("-")) << endl;
+    }
+
+    cout << "Indirim kodu vermek istediginiz kullaniciyi giriniz: " << endl;
+    cin >> kullaniciAdi;
 
     cout << "Indirim kodunu giriniz: " << endl;
     cin >> kod;
@@ -811,15 +824,15 @@ void Yonetici::IndirimKoduEkle()
     cout << "Indirim miktarini giriniz: " << endl;
     cin >> indirim;
 
-    if (IndirimlerFile.is_open())
+    if (IndirimlerDosya.is_open())
     {
-        IndirimlerFile << kod << " " << indirim << endl;
+        IndirimlerDosya << kullaniciAdi << " " << kod << " " << indirim << endl;
     }
     else
     {
         cout << "Boyle bir dosya bulunamadi." << endl;
     }
-    IndirimlerFile.close();
+    IndirimlerDosya.close();
 }
 void Yonetici::FaturaOku()
 {
@@ -1184,8 +1197,8 @@ MENU:
     Kurye kurye;
     ofstream SiparislerFile("./siparisler.txt", ios::app);
     ofstream FaturalarFile("./faturalar.txt", ios::app);
-    string sepet = "";
-    int sepetTutari = 0;
+    // string sepet = "";
+    // int sepetTutari = 0;
     string urun = urunler.getElement(urunIndex);
 
     // Urun Fiyat
@@ -1267,7 +1280,6 @@ MENU:
     kiyafet.set_boyut(secilenBeden);
     kiyafet.set_renk(secilenRenk);
 
-    // Siparis Fiyat
     double siparisFiyat = adet * priceFromLineInt;
 
     k.setSepet(k.getSepet() + "," + kiyafet.get_kategori() + "-" +
@@ -1279,25 +1291,6 @@ MENU:
     k.setSepetTutari(k.getSepetTutari() + siparisFiyat);
 
     int sepetTutari = k.getSepetTutari();
-
-    ifstream IndirimlerDosya("./indirimler.txt");
-
-    string Indirim;
-    string IndirimKodu;
-    string IndirimMiktari;
-    int IndirimMiktariInt;
-    while (getline(IndirimlerDosya, Indirim))
-    {
-        if (Indirim.substr(0, Indirim.find(" ")) == k.getIndirimKodu())
-        {
-            IndirimMiktari = Indirim.substr(Indirim.find(" "), Indirim.length());
-            istringstream(IndirimMiktari) >> IndirimMiktariInt;
-            sepetTutari = sepetTutari - ((sepetTutari * IndirimMiktariInt) / 100);
-            cout << k.getIndirimKodu() << " Kodu uygulandi." << endl;
-        }
-        
-    }
-    
 
     string alisverisDevam;
     cout << "Alisverise devam etmek ister misiniz? (e/h)" << endl;
@@ -1317,8 +1310,32 @@ MENU:
     }
     else if (alisverisDevam == "h")
     {
-        // Siparis SiparisNo
         int siparisNo = rand() % 9999999 + 1000000;
+
+        ifstream IndirimlerDosya("./indirimler.txt");
+
+        string Indirim;
+        string IndirimKodu;
+        string IndirimMiktari;
+        int IndirimMiktariInt;
+        while (getline(IndirimlerDosya, Indirim))
+        {
+            if (Indirim.substr(0, Indirim.find(" ")) == k.getKullaniciAdi())
+            {
+                // Indirim kodu alma
+                Indirim.erase(0, Indirim.find(" ") + 1);
+                IndirimKodu = Indirim.substr(0, Indirim.find(" "));
+
+                // Indirim Miktari
+                Indirim.erase(0, Indirim.find(" ") + 1);
+                IndirimMiktari = Indirim.substr(0, Indirim.length());
+                istringstream(IndirimMiktari) >> IndirimMiktariInt;
+
+                // Sepet tutarindan indirim cikarma
+                sepetTutari = sepetTutari - ((sepetTutari * IndirimMiktariInt) / 100);
+                cout << IndirimKodu << " Kodu uygulandi." << endl;
+            }
+        }
 
         Siparis s(k.getKullaniciAdi(), k.getAdres(), ">" + k.getSepet() + " ", to_string(siparisNo), sepetTutari, z.getCurrentTime());
         s.set_siparis_ulasim(kurye.VarisZamaniHesapla(s, kurye.KuryeSec(s)));

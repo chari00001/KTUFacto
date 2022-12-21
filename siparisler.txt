@@ -7,3 +7,10 @@ chari00001-Ortahisar->,A-UrunA1-100-XXL-Yesil,A-UrunA1-100-M-Mavi -7570590-200-2
 chari00001-Ortahisar->,A-UrunA1-100-XL-Mavi,C-UrunC2-170-XS-Siyah -4877582-610-22:38-23:13
 chari00001-Ortahisar->,A-UrunA1-100-XL-Mavi,E-UrunE2-700-S-Mor -5280192-800-22:49-23:24
 chari00001-Ortahisar->,A-UrunA1-100-M-Mavi,E-UrunE2-700-L-Mor,C-UrunC2-170-XXS-Beyaz -8746248-1670-22:59-23:34
+chari00001-Ortahisar->,C-UrunC2-170-S-Beyaz,E-UrunE2-700-L-Mor -6377115-2270-16:06-23:48
+chari00001-Ortahisar->,A-UrunA2-150-X-Siyah,E-UrunE2-700-L-Mor -2192083-1150-16:09-23:59
+chari00001-Ortahisar->,A-UrunA1-100-X-Yesil,E-UrunE1-800-X-Kirmizi -2432963-900-16:11-00:02
+chari00001-Ortahisar->,C-UrunC1-160-S-Mavi -1079628-160-16:13-00:02
+chari00001-Ortahisar->,A-UrunA1-100-X-Kirmizi -3700175-100-16:14-00:02
+chari00001-Ortahisar->,A-UrunA1-100-X-Mavi -7252505-100-16:14-00:02
+chari00001-Ortahisar->,A-UrunA1-100-X-Yesil -6094347-50-16:15-00:02
