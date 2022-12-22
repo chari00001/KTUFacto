@@ -1,29 +1,10 @@
-chari00001-Ortahisar-A-UrunA1-100-XL-Mavi-5137627-100-22:30
-chari00001-Ortahisar-A-UrunA1-100-XL-Mavi-7723889-100-22:33
-chari00001-Ortahisar-A-UrunA1-100-XL-Mavi-6966860-100-22:34
-chari00001-Ortahisar-A-UrunA1-100-XL-Mavi-3483619-100-22:39
-chari00001-Ortahisar-A-UrunA1-100-XL-Mavi-1528689-100-22:39
-chari00001-Ortahisar-A-UrunA1-100-XL-Mavi-1720275-100-23:38
-chari00001-Ortahisar-A-UrunA1-100-XL-Mavi-1949332-100-23:40
-chari00001-Ortahisar-/,A-UrunA1-100-XL-Yesil/,C-UrunC2-170-XS-Siyah-8973833-780-23:40
-chari00001-Ortahisar-,A-UrunA1-100-XXL-Mavi,E-UrunE2-700-L-Mor-10774576-800-23:44
-chari00001-Ortahisar-,A-UrunA1-100-XL-Yesil-4879211-100-23:47
-chari00001-Ortahisar-,A-UrunA1-100-XXL-Yesil,A-UrunA1-100-M-Mavi-7570590-200-23:49
-beste00001-Arakli-,B-UrunB2-120-XXL-Sari,E-UrunE2-700-L-Mor,C-UrunC2-170-XS-Siyah-3145635-1570-23:50
-enes00001-Yomra-,C-UrunC2-170-S-Beyaz-3764245-340-23:51
-chari00001-Ortahisar-,C-UrunC1-160-S-Mavi,A-UrunA2-150-XXL-Pembe,C-UrunC2-170-S-Beyaz-6182926-650-23:52
-chari00001-Ortahisar-,A-UrunA1-100-M-Mavi,C-UrunC2-170-XS-Siyah,C-UrunC2-170-XXS-Siyah-2446285-440-23:53
-chari00001-Ortahisar-,A-UrunA3-180-XXS-Sari,C-UrunC2-170-XS-Siyah-1103368-530-23:55
-chari00001-Ortahisar-,C-UrunC2-170-XXS-Siyah,A-UrunA1-100-XL-Mavi-5123939-270-23:56
-chari00001-Ortahisar-,A-UrunA2-150-XL-Pembe,E-UrunE2-700-S-Mor-1018845-850-00:02
-chari00001-Ortahisar-,A-UrunA1-100-XL-Mavi,C-UrunC2-170-XS-Siyah,-4877582-610-22:38
-chari00001-Ortahisar- ,A-UrunA1-100-XL-Mavi,E-UrunE2-700-S-Mor -5280192-800-22:49
-chari00001-Ortahisar- , -3348500-1060-22:52
-chari00001-Ortahisar->,A-UrunA1-100-M-Mavi,E-UrunE2-700-L-Mor,C-UrunC2-170-XXS-Beyaz -8746248-1670-22:59
-chari00001-Ortahisar->,C-UrunC2-170-S-Beyaz,E-UrunE2-700-L-Mor -6377115-2270-16:06
-chari00001-Ortahisar->,A-UrunA2-150-X-Siyah,E-UrunE2-700-L-Mor -2192083-1150-16:09
-chari00001-Ortahisar->,A-UrunA1-100-X-Yesil,E-UrunE1-800-X-Kirmizi -2432963-900-16:11
-chari00001-Ortahisar->,C-UrunC1-160-S-Mavi -1079628-160-16:13
-chari00001-Ortahisar->,A-UrunA1-100-X-Kirmizi -3700175-100-16:14
-chari00001-Ortahisar->,A-UrunA1-100-X-Mavi -7252505-100-16:14
-chari00001-Ortahisar->,A-UrunA1-100-X-Yesil -6094347-50-16:15
+chari00001-Ortahisar->,A-UrunA1-100-M-Mavi,E-UrunE2-700-L-Mor,C-UrunC2-170-XXS-Beyaz<-8746248-1670-22:59
+chari00001-Ortahisar->,C-UrunC2-170-S-Beyaz,E-UrunE2-700-L-Mor<-6377115-2270-16:06
+chari00001-Ortahisar->,A-UrunA2-150-X-Siyah,E-UrunE2-700-L-Mor<-2192083-1150-16:09
+chari00001-Ortahisar->,A-UrunA1-100-X-Yesil,E-UrunE1-800-X-Kirmizi<-2432963-900-16:11
+chari00001-Ortahisar->,C-UrunC1-160-S-Mavi<-1079628-160-16:13
+chari00001-Ortahisar->,A-UrunA1-100-X-Kirmizi<-3700175-100-16:14
+chari00001-Ortahisar->,A-UrunA1-100-X-Mavi<-7252505-100-16:14
+chari00001-Ortahisar->,A-UrunA1-100-X-Yesil<-6094347-50-16:15
+chari00001-Ortahisar->,E-UrunE2-700-l-siyah,C-UrunC2-170-xxs-beyaz<-9734807-785-13:30
+chari00001-Ortahisar->,B-UrunB2-120-XL-SARI,A-UrunA2-150-XXL-KIRMIZI<-1300330-345-13:34
