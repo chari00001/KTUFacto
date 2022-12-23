@@ -1,7 +1,7 @@
 
-//Öğrenciler: Sinan Kocatürk 410452, Berk Çağrı Laçin 413518, Enes Ceviz 402498
-//Ders Adı: Nesne Yönelimli Programlama
-//Grup: Grup-18
+// Öğrenciler: Sinan Kocatürk 410452, Berk Çağrı Laçin 413518, Enes Ceviz 402498
+// Ders Adı: Nesne Yönelimli Programlama
+// Grup: Grup-18
 
 #include <iostream>
 #include <string>
@@ -174,8 +174,6 @@ public:
 
     void dosyaOku(string, vector<string>);
     void YeniSifreDosyaYaz(string, vector<string>, string);
-
-
 };
 
 class Yonetici : public Kisi
@@ -559,14 +557,13 @@ void Kullanici::KullaniciKaydet()
     string ePosta;
     string adres;
     string indirimKodu;
-    string dTarihi= " ";
+    string dTarihi = " ";
 
     string line;
     while (getline(KullanicilarDosyaOku, line))
     {
         list.push_back(line.substr(0, line.find("-")));
     }
-
 
     KullanicilarDosyaOku.close();
 
@@ -615,7 +612,8 @@ KONTROL:
         }
 
         while (sifreKontrol(sifre) == false)
-        {  sifre = SifreMaskeleme("Sifrenizi Giriniz:", true);
+        {
+            sifre = SifreMaskeleme("Sifrenizi Giriniz:", true);
 
             if (sifreKontrol(sifre))
             {
@@ -642,32 +640,33 @@ KONTROL:
             }
         }
         ifstream AdresDosya("./konumlar.txt");
-        if(AdresDosya.is_open()){
+        if (AdresDosya.is_open())
+        {
             string line;
-            while(getline(AdresDosya,line)){
-                konumList.push_back(line.substr(0,line.find("-")));
+            while (getline(AdresDosya, line))
+            {
+                konumList.push_back(line.substr(0, line.find("-")));
             }
         }
         AdresDosya.close();
 
+    ADRES:
+        cout << "Mevcut Adresler\n";
 
-        ADRES:
-        cout<<"Mevcut Adresler\n";
-
-        for(int i = 0 ; i<konumList.size(); i++){
-            cout<<konumList[i]<<endl;
+        for (int i = 0; i < konumList.size(); i++)
+        {
+            cout << konumList[i] << endl;
         }
-
 
         cout << "\nIlcenizi giriniz: ";
         getline(cin >> ws, adres);
 
-        if(!(find(konumList.begin(), konumList.end(), adres) != konumList.end())){
+        if (!(find(konumList.begin(), konumList.end(), adres) != konumList.end()))
+        {
             system("CLS");
-            cout<<"Gecersiz Konum Girdiniz..."<<endl;
+            cout << "Gecersiz Konum Girdiniz..." << endl;
             goto ADRES;
         }
-
 
         cout << "\nIndirim kodu: ";
         getline(cin >> ws, indirimKodu);
@@ -808,7 +807,6 @@ bool Kullanici::dogumTarihiKontrol(string dogumTarihi)
 {
     regex dTarihiexp{"(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[012])/([0-9]{4})"};
 
-
     return regex_match(dogumTarihi, dTarihiexp);
 }
 
@@ -921,7 +919,7 @@ YANLIS_SECIM:
     else
     {
         cout << "Yanlis Secim" << endl;
-        goto   YANLIS_SECIM;
+        goto YANLIS_SECIM;
     }
 
     SiparislerDosya.close();
@@ -1058,18 +1056,31 @@ void Yonetici::FaturaOku()
 
 void Menu::MenuBaslat()
 {
-    ofstream KonumlarDosya("./konumlar.txt",ostream::out | ostream::trunc);
-    if(KonumlarDosya.is_open())
-        {
-        KonumlarDosya<< "Ortahisar" <<"-"<<"35"<<endl;
-        KonumlarDosya<< "Akcaabat" <<"-"<<"50"<<endl;
-        KonumlarDosya<< "Vakfikebir" <<"-"<<"90"<<endl;
-        KonumlarDosya<< "Besikduzu" <<"-"<<"110"<<endl;
-        KonumlarDosya<< "Yomra" <<"-"<<"55"<<endl;
-        KonumlarDosya<< "Arsin" <<"-"<<"70"<<endl;
-        KonumlarDosya<< "Arakli" <<"-"<<"100"<<endl;
-
-        }
+    ofstream KonumlarDosya("./konumlar.txt", ostream::out | ostream::trunc);
+    if (KonumlarDosya.is_open())
+    {
+        KonumlarDosya << "Ortahisar"
+                      << "-"
+                      << "35" << endl;
+        KonumlarDosya << "Akcaabat"
+                      << "-"
+                      << "50" << endl;
+        KonumlarDosya << "Vakfikebir"
+                      << "-"
+                      << "90" << endl;
+        KonumlarDosya << "Besikduzu"
+                      << "-"
+                      << "110" << endl;
+        KonumlarDosya << "Yomra"
+                      << "-"
+                      << "55" << endl;
+        KonumlarDosya << "Arsin"
+                      << "-"
+                      << "70" << endl;
+        KonumlarDosya << "Arakli"
+                      << "-"
+                      << "100" << endl;
+    }
     KonumlarDosya.close();
 ANA_MENU:
     string opsiyon1, opsiyon2;
@@ -1140,11 +1151,11 @@ void Menu::YoneticiGiris()
     AdminDosya >> sifre;
     AdminDosya.close();
     Kisi k;
-    ADMIN_KONTROL:
-    girilenSifre=y.SifreMaskeleme("Admin sifrenizi giriniz:",true);
+ADMIN_KONTROL:
+    girilenSifre = y.SifreMaskeleme("Admin sifrenizi giriniz:", true);
     system("CLS");
 
-    if (sifre == girilenSifre || girilenSifre=="1")
+    if (sifre == girilenSifre || girilenSifre == "1")
     {
     YONETICI_MENU:
         cout << "1 - Urun ekle\n2 - Kurye ekle\n3 - Sikayet ve Oneriler\n4 - Indirim kodu tanimla\n5 - Siparis Faturalari" << endl;
@@ -1267,7 +1278,6 @@ KULLANICI_GIRIS:
             else
             {
                 system("CLS");
-
             }
         }
 
@@ -1410,18 +1420,17 @@ void Menu::UrunleriListele(string Selection, Kullanici k)
 
     URUN_SEC:
 
-
         string urunSTR;
         cout << "Urun seciniz : " << endl;
         cin >> urunSTR;
-    istringstream iss(urunSTR);
-    while (!(iss >> secilenUrunIndex))
-    {
-        cout << "Lutfen bir sayi giriniz: " << endl;
-        cin >> urunSTR;
-        iss.clear();
-        iss.str(urunSTR);
-    }
+        istringstream iss(urunSTR);
+        while (!(iss >> secilenUrunIndex))
+        {
+            cout << "Lutfen bir sayi giriniz: " << endl;
+            cin >> urunSTR;
+            iss.clear();
+            iss.str(urunSTR);
+        }
 
         if (secilenUrunIndex > 0 && secilenUrunIndex <= index)
         {
@@ -1465,8 +1474,6 @@ MENU:
 
     cout << "Secilen urun: " << endl;
     cout << urun << endl;
-
-
 
     // Siparis Adet
     int adet;
@@ -1565,7 +1572,8 @@ MENU:
 
     string alisverisDevam;
 DEVAM:
-    cout << "sepet tutariniz: \n" <<sepetTutari<<"TL \nAlisverise devam etmek ister misiniz? (e/h)" << endl;
+    cout << "sepet tutariniz: \n"
+         << sepetTutari << "TL \nAlisverise devam etmek ister misiniz? (e/h)" << endl;
     cin >> alisverisDevam;
     system("CLS");
 
@@ -1577,7 +1585,6 @@ DEVAM:
         string categorySelection;
         cout << "Kategori seciniz (Tum kategoriler icin 0 yaziniz): " << endl;
         getline(cin >> ws, categorySelection);
-
 
         system("CLS");
         UrunleriListele(categorySelection, k);
@@ -1611,7 +1618,7 @@ DEVAM:
                 // Sepet tutarindan indirim cikarma
                 sepetTutari = sepetTutari - ((sepetTutari * IndirimMiktariInt) / 100);
                 cout << IndirimKodu << " Kodu uygulandi." << endl;
-                cout << "Guncel sepet tutari:" << sepetTutari <<endl;
+                cout << "Guncel sepet tutari:" << sepetTutari << endl;
             }
         }
 
@@ -2104,6 +2111,3 @@ int main()
 
     m.MenuBaslat();
 }
-
-
-
