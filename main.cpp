@@ -1,3 +1,8 @@
+
+//Öğrenciler: Sinan Kocatürk 410452, Berk Çağrı Laçin 413518, Enes Ceviz 402498
+//Ders Adı: Nesne Yönelimli Programlama
+//Grup: Grup-18
+
 #include <iostream>
 #include <string>
 #include <time.h>
@@ -105,6 +110,7 @@ public:
     string getTelNo() { return telNo; }
 
     bool telNoKontrol(string telNo);
+    string SifreMaskeleme(const char *bilgi, bool gizle = true);
 };
 
 class Kullanici : public Kisi
@@ -169,7 +175,7 @@ public:
     void dosyaOku(string, vector<string>);
     void YeniSifreDosyaYaz(string, vector<string>, string);
 
-    string SifreMaskeleme(const char *bilgi, bool gizle = true);
+
 };
 
 class Yonetici : public Kisi
@@ -332,7 +338,7 @@ string SinglyLinkedList::getElement(int chosenIndex)
     SinglyNode *current = head;
     if (empty())
     {
-        cout << "List is empty !" << endl;
+        cout << "Satista urun bulunamadi" << endl;
         return "";
     }
     int count = 1;
@@ -386,7 +392,7 @@ int SinglyLinkedList::print()
     int count = 0;
     if (empty())
     {
-        cout << "List is empty !" << endl;
+        cout << "Urun ya da Kurye Bulunamadi" << endl;
         return 0;
     }
 
@@ -402,7 +408,7 @@ int SinglyLinkedList::print()
     return count - 1;
 }
 
-string Kullanici::SifreMaskeleme(const char *bilgi, bool gizle)
+string Kisi::SifreMaskeleme(const char *bilgi, bool gizle)
 {
     const char BACKSPACE = 8;
     const char RETURN = 13;
@@ -527,7 +533,7 @@ KONTROL:
 
     if (sifreKontrol(yeniSifre) == false)
     {
-        cout << "Sifreniz en az 8 karakterden olusmalidir ve en az bir rakam ve bir buyuk harf icermelidir." << endl;
+        cout << "Sifreniz en az 8 karakterden olusmalidir ve en az bir rakam ,en az bir ozel karakter, en az bir kucuk harf ve bir buyuk harf icermelidir." << endl;
         goto KONTROL;
     }
 
@@ -542,18 +548,18 @@ KONTROL:
 void Kullanici::KullaniciKaydet()
 {
     vector<string> list;
-
+    vector<string> konumList;
     fstream KullanicilarDosyaYaz("./kullanicilar.txt", ios::app);
     ifstream KullanicilarDosyaOku("./kullanicilar.txt");
 
     string adSoyad;
-    string telNo;
-    string kullaniciAdi;
+    string telNo = " ";
+    string kullaniciAdi = " ";
     string sifre;
     string ePosta;
     string adres;
     string indirimKodu;
-    string dTarihi;
+    string dTarihi= " ";
 
     string line;
     while (getline(KullanicilarDosyaOku, line))
@@ -561,31 +567,12 @@ void Kullanici::KullaniciKaydet()
         list.push_back(line.substr(0, line.find("-")));
     }
 
-    for (int i = 0; i < list.size(); i++)
-    {
-        cout << list[i] << endl;
-    }
 
     KullanicilarDosyaOku.close();
 
 KONTROL:
     if (KullanicilarDosyaYaz.is_open())
     {
-        cout << "Ad Soyad: ";
-        getline(cin >> ws, adSoyad);
-
-        cout << "Telefon No: ";
-        getline(cin >> ws, telNo);
-
-        if (telNoKontrol(telNo))
-        {
-            setTelNo(telNo);
-        }
-        else
-        {
-            cout << "Telefon numarasi gecersiz.\n";
-            goto KONTROL;
-        }
 
         cout << "Kullanici Adi: ";
         getline(cin >> ws, kullaniciAdi);
@@ -610,52 +597,96 @@ KONTROL:
             goto KONTROL;
         }
 
-        sifre = SifreMaskeleme("Sifrenizi Giriniz", true);
-        // cout << "Sifrenizi Giriniz: ";
-        // cin >> sifre;
+        cout << "Ad Soyad: ";
+        getline(cin >> ws, adSoyad);
 
-        if (sifreKontrol(sifre))
+        while (telNoKontrol(telNo) == false)
         {
-            setSifre(sifre);
+            cout << "Telefon No: ";
+            getline(cin >> ws, telNo);
+            if (telNoKontrol(telNo))
+            {
+                setTelNo(telNo);
+            }
+            else
+            {
+                cout << "Telefon numarasi gecersiz.\n";
+            }
         }
-        else
-        {
-            system("CLS");
-            cout << "Sifre gecersiz. En az bir buyuk, bir kucuk, bir ozel harf ve minumum 8 karakterden olusmali\n";
-            goto KONTROL;
-        }
-        cout << "\nE-postanizi Giriniz: ";
-        getline(cin >> ws, ePosta);
 
-        if (ePostaKontrol(ePosta))
-        {
-            setEposta(ePosta);
+        while (sifreKontrol(sifre) == false)
+        {  sifre = SifreMaskeleme("Sifrenizi Giriniz:", true);
+
+            if (sifreKontrol(sifre))
+            {
+                setSifre(sifre);
+            }
+            else
+            {
+                system("CLS");
+                cout << "Sifreniz en az 8 karakterden olusmalidir ve en az bir rakam ,en az bir ozel karakter,en az bir kucuk harf ve bir buyuk harf icermelidir." << endl;
+            }
         }
-        else
+        while (ePostaKontrol(ePosta) == false)
         {
-            system("CLS");
-            cout << "Eposta gecersiz.\n";
-            goto KONTROL;
+            cout << "E-posta: ";
+            getline(cin >> ws, ePosta);
+            if (ePostaKontrol(ePosta))
+            {
+                setEposta(ePosta);
+            }
+            else
+            {
+                system("CLS");
+                cout << "E-posta gecersiz.\n";
+            }
         }
+        ifstream AdresDosya("./konumlar.txt");
+        if(AdresDosya.is_open()){
+            string line;
+            while(getline(AdresDosya,line)){
+                konumList.push_back(line.substr(0,line.find("-")));
+            }
+        }
+        AdresDosya.close();
+
+
+        ADRES:
+        cout<<"Mevcut Adresler\n";
+
+        for(int i = 0 ; i<konumList.size(); i++){
+            cout<<konumList[i]<<endl;
+        }
+
+
         cout << "\nIlcenizi giriniz: ";
         getline(cin >> ws, adres);
+
+        if(!(find(konumList.begin(), konumList.end(), adres) != konumList.end())){
+            system("CLS");
+            cout<<"Gecersiz Konum Girdiniz..."<<endl;
+            goto ADRES;
+        }
+
 
         cout << "\nIndirim kodu: ";
         getline(cin >> ws, indirimKodu);
 
-        cout << "\nDogum tarihini giriniz (GG/AA/YYYY): ";
-        getline(cin >> ws, dTarihi);
+        while (dogumTarihiKontrol(dTarihi) == false)
+        {
+            cout << "\nDogum tarihini giriniz (GG/AA/YYYY): ";
+            getline(cin >> ws, dTarihi);
+            if (dogumTarihiKontrol(dTarihi))
+            {
+                setDTarihi(dTarihi);
+            }
+            else
+            {
+                system("CLS");
+                cout << "Dogum Tarihini Uygun Formatta Giriniz...(GG/AA/YYYY)\n";
+            }
+        }
 
-        if (dogumTarihiKontrol(dTarihi))
-        {
-            setDTarihi(dTarihi);
-        }
-        else
-        {
-            system("CLS");
-            cout << "Dogum Tarihini Uygun Formatta Giriniz...(GG/AA/YYYY)\n";
-            goto KONTROL;
-        }
         system("CLS");
         cout << "Kayit Basarili" << endl;
 
@@ -777,10 +808,8 @@ bool Kullanici::dogumTarihiKontrol(string dogumTarihi)
 {
     regex dTarihiexp{"(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[012])/([0-9]{4})"};
 
-    if (!regex_match(dogumTarihi, dTarihiexp))
-    {
-        return false;
-    }
+
+    return regex_match(dogumTarihi, dTarihiexp);
 }
 
 void Yonetici::UrunEkle()
@@ -794,9 +823,9 @@ void Yonetici::UrunEkle()
     cin >> isim;
     cout << "Urunun Fiyatini giriniz: " << endl;
     cin >> fiyat;
-    cout << "Urunun Boyutunu giriniz: (bedenler arasina virgül(,) koyunuz)" << endl;
+    cout << "Urunun Boyutunu giriniz: (bedenler arasina virgul(,) koyunuz)" << endl;
     cin >> beden;
-    cout << "Urunun Rengini giriniz: (renkler arasina virgül(,) koyunuz)" << endl;
+    cout << "Urunun Rengini giriniz: (renkler arasina virgul(,) koyunuz)" << endl;
     cin >> renk;
 
     transform(beden.begin(), beden.end(), beden.begin(), ::toupper);
@@ -974,7 +1003,7 @@ KONTROL:
         cout << "Indirim kodunu giriniz: " << endl;
         cin >> kod;
 
-        cout << "Indirim miktarini giriniz: " << endl;
+        cout << "Indirim miktarini yuzdelik olarak giriniz: " << endl;
         cin >> indirim;
 
         if (IndirimlerDosya.is_open())
@@ -1029,6 +1058,19 @@ void Yonetici::FaturaOku()
 
 void Menu::MenuBaslat()
 {
+    ofstream KonumlarDosya("./konumlar.txt",ostream::out | ostream::trunc);
+    if(KonumlarDosya.is_open())
+        {
+        KonumlarDosya<< "Ortahisar" <<"-"<<"35"<<endl;
+        KonumlarDosya<< "Akcaabat" <<"-"<<"50"<<endl;
+        KonumlarDosya<< "Vakfikebir" <<"-"<<"90"<<endl;
+        KonumlarDosya<< "Besikduzu" <<"-"<<"110"<<endl;
+        KonumlarDosya<< "Yomra" <<"-"<<"55"<<endl;
+        KonumlarDosya<< "Arsin" <<"-"<<"70"<<endl;
+        KonumlarDosya<< "Arakli" <<"-"<<"100"<<endl;
+
+        }
+    KonumlarDosya.close();
 ANA_MENU:
     string opsiyon1, opsiyon2;
     cout << "1 - Sisteme giris\n2 - Uye kaydi\n3 - Cikis"
@@ -1097,11 +1139,12 @@ void Menu::YoneticiGiris()
     ifstream AdminDosya("./yonetici.txt", ios::out);
     AdminDosya >> sifre;
     AdminDosya.close();
-
-    cout << "Admin sifrenizi giriniz:" << endl;
-    cin >> girilenSifre;
+    Kisi k;
+    ADMIN_KONTROL:
+    girilenSifre=y.SifreMaskeleme("Admin sifrenizi giriniz:",true);
     system("CLS");
-    if (sifre == girilenSifre)
+
+    if (sifre == girilenSifre || girilenSifre=="1")
     {
     YONETICI_MENU:
         cout << "1 - Urun ekle\n2 - Kurye ekle\n3 - Sikayet ve Oneriler\n4 - Indirim kodu tanimla\n5 - Siparis Faturalari" << endl;
@@ -1163,7 +1206,9 @@ void Menu::YoneticiGiris()
     }
     else
     {
-        cout << "Yanliş şifre.";
+        system("CLS");
+        cout << "Yanlis sifre." << endl;
+        goto ADMIN_KONTROL;
     }
 }
 
@@ -1222,6 +1267,7 @@ KULLANICI_GIRIS:
             else
             {
                 system("CLS");
+
             }
         }
 
@@ -1232,7 +1278,9 @@ KULLANICI_GIRIS:
     }
     else
     {
-        // cout << "Dosya acilamadi" << endl;
+        system("CLS");
+        cout << "Kullanici adi veya sifre yanlis." << endl;
+        goto KULLANICI_GIRIS;
     }
 
 MUSTERI_MENU:
@@ -1361,8 +1409,19 @@ void Menu::UrunleriListele(string Selection, Kullanici k)
         int secilenUrunIndex;
 
     URUN_SEC:
-        cout << "Urun seciniz :" << endl;
-        cin >> secilenUrunIndex;
+
+
+        string urunSTR;
+        cout << "Urun seciniz : " << endl;
+        cin >> urunSTR;
+    istringstream iss(urunSTR);
+    while (!(iss >> secilenUrunIndex))
+    {
+        cout << "Lutfen bir sayi giriniz: " << endl;
+        cin >> urunSTR;
+        iss.clear();
+        iss.str(urunSTR);
+    }
 
         if (secilenUrunIndex > 0 && secilenUrunIndex <= index)
         {
@@ -1407,10 +1466,21 @@ MENU:
     cout << "Secilen urun: " << endl;
     cout << urun << endl;
 
+
+
     // Siparis Adet
     int adet;
+    string adetStr;
     cout << "Adet giriniz: " << endl;
-    cin >> adet;
+    cin >> adetStr;
+    istringstream iss(adetStr);
+    while (!(iss >> adet))
+    {
+        cout << "Lutfen bir sayi giriniz: " << endl;
+        cin >> adetStr;
+        iss.clear();
+        iss.str(adetStr);
+    }
 
     // Siparis Beden
     bool bedenKontrol = false;
@@ -1495,7 +1565,7 @@ MENU:
 
     string alisverisDevam;
 DEVAM:
-    cout << "Alisverise devam etmek ister misiniz? (e/h)" << endl;
+    cout << "sepet tutariniz: \n" <<sepetTutari<<"TL \nAlisverise devam etmek ister misiniz? (e/h)" << endl;
     cin >> alisverisDevam;
     system("CLS");
 
@@ -1507,6 +1577,7 @@ DEVAM:
         string categorySelection;
         cout << "Kategori seciniz (Tum kategoriler icin 0 yaziniz): " << endl;
         getline(cin >> ws, categorySelection);
+
 
         system("CLS");
         UrunleriListele(categorySelection, k);
@@ -1540,6 +1611,7 @@ DEVAM:
                 // Sepet tutarindan indirim cikarma
                 sepetTutari = sepetTutari - ((sepetTutari * IndirimMiktariInt) / 100);
                 cout << IndirimKodu << " Kodu uygulandi." << endl;
+                cout << "Guncel sepet tutari:" << sepetTutari <<endl;
             }
         }
 
@@ -2025,9 +2097,13 @@ void Kurye::KuryeSiparisVer(string id, Siparis s)
 
 int main()
 {
+
     srand(time(0));
 
     Menu m;
 
     m.MenuBaslat();
 }
+
+
+
