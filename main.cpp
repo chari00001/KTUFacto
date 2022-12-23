@@ -1,8 +1,8 @@
 #include <iostream>
 #include <string>
 #include <time.h>
-// #include <conio.h> // for Windows
-#include <curses.h> // For Linux
+#include <conio.h> // for Windows
+// #include <curses.h> // For Linux
 #include <regex>
 #include <fstream>
 #include <list>
@@ -36,6 +36,24 @@ public:
     int print();
     string getElement(int);
 };
+
+// Switch case ifadelerinde olusan bi sonsuz dongu sorununun cozumu icin.
+char charTanimla(string donusen)
+{
+    char donen = '0';
+
+    if (donusen.size() == 1)
+    {
+        donen = donusen[0];
+        return donen;
+    }
+    if (donusen.size() > 1)
+    {
+        return donen;
+    }
+
+    return donen;
+}
 
 class Zaman
 {
@@ -108,6 +126,16 @@ public:
         setSepet(Sepet);
         setSepetTutari(SepetTutari);
     }
+    Kullanici(string adSoyad, string telNo, string kullaniciAdi, string ePosta, string adres, string sifre, string indirimKodu, string dTarihi)
+        : Kisi(adSoyad, telNo)
+    {
+        this->kullaniciAdi = kullaniciAdi;
+        this->ePosta = ePosta;
+        this->adres = adres;
+        this->sifre = sifre;
+        this->indirimKodu = indirimKodu;
+        this->dTarihi = dTarihi;
+    }
 
     void setKullaniciAdi(string kullaniciAdi) { this->kullaniciAdi = kullaniciAdi; }
     void setEposta(string ePosta) { this->ePosta = ePosta; }
@@ -127,6 +155,7 @@ public:
     string getSepet() { return sepet; }
     double getSepetTutari() { return sepetTutari; }
 
+    // Musteri menu fonksiyonlari
     void SikayetYaz();
     void SifreDegistir();
     void KullaniciKaydet();
@@ -140,7 +169,7 @@ public:
     void dosyaOku(string, vector<string>);
     void YeniSifreDosyaYaz(string, vector<string>, string);
 
-    string sifrele(const char *bilgi, bool gizle = true);
+    string SifreMaskeleme(const char *bilgi, bool gizle = true);
 };
 
 class Yonetici : public Kisi
@@ -149,9 +178,13 @@ private:
     string sifre;
 
 public:
-    Yonetici(string Sifre = "") { sifre = Sifre; }
+    Yonetici(string adSoyad = "", string telNo = "", string Sifre = "") : Kisi(adSoyad, telNo)
+    {
+        this->sifre = Sifre;
+    }
     void set_sifre(string sifre) { this->sifre = sifre; }
 
+    // Yonetici menu fonksiyonlari
     void UrunEkle();
     void KuryeEkle();
     void SikayetOku();
@@ -259,9 +292,9 @@ public:
     string VarisZamaniHesapla(Siparis s, string kuryeId);
     Zaman VarisZamani(Siparis s, string kuryeId);
 
-    void KuryeAta(string varisZamani);
     string KuryeSec(Siparis s);
 
+    // Kurye musaitlik kontrol fonksiyonlari
     string BosKuryeKontrol();
     string BitmisKuryeKontrol();
     string IlkKuryeKontrol();
@@ -274,13 +307,16 @@ class Menu
 public:
     void MenuBaslat();
 
+    // Sistem giris fonksiyonlari
     void YoneticiGiris();
     void MusteriGiris();
 
+    // Linked list kullandigimiz yerler
     SinglyLinkedList KategorileriListele();
     void UrunleriListele(string Selection, Kullanici k);
     void UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k);
 
+    // Beden ve Renkleri "," ayiracindan ayirip kontrol etmek icin.
     bool Parcala(string, string);
 };
 
@@ -319,6 +355,8 @@ bool SinglyLinkedList::empty() const
 void SinglyLinkedList::addBack(const string &e)
 {
     SinglyNode *v = new SinglyNode;
+    // Normalde gelen elemanin daha once olup olmadigi kontrol edilmezken
+    // asagidaki for dongusu ile kontrol saglanmistir.
     for (SinglyNode *i = head; i != NULL; i = i->next)
     {
         if (i->elem == e)
@@ -360,45 +398,48 @@ int SinglyLinkedList::print()
         count++;
     }
 
+    // Ihtiyac halinde ekrana liste yazdirmanin yaninda eleman sayisini da dondurur.
     return count - 1;
 }
 
-// string Kullanici::sifrele(const char *bilgi, bool gizle)
-// {
-//     const char BACKSPACE = 8;
-//     const char RETURN = 13;
+string Kullanici::SifreMaskeleme(const char *bilgi, bool gizle)
+{
+    const char BACKSPACE = 8;
+    const char RETURN = 13;
 
-//     string sifre;
-//     char harf = 0;
+    string sifre;
+    char harf = 0;
 
-//     cout << bilgi << " ";
+    cout << bilgi << " ";
 
-//     while ((harf = _getch()) != RETURN)
-//     {
-//         if (harf == BACKSPACE)
-//         {
-//             if (sifre.length() != 0)
-//             {
-//                 if (gizle)
-//                     cout << "\b \b";
-//                 sifre.pop_back();
-//             }
-//         }
-//         else if (harf == 0 || harf == 224) // handle escape sequences
-//         {
-//             _getch(); // ignore non printable chars
-//             continue;
-//         }
-//         else
-//         {
-//             sifre.push_back(harf);
-//             if (gizle)
-//                 cout << '*';
-//         }
-//     }
-//     cout << endl;
-//     return sifre;
-// }
+    while ((harf = _getch()) != RETURN)
+    {
+        if (harf == BACKSPACE)
+        {
+            if (sifre.length() != 0)
+            {
+                if (gizle)
+                    cout << "\b \b";
+                sifre.pop_back();
+            }
+        }
+        else if (harf == 0 || harf == 224)
+        {
+            _getch();
+            continue;
+        }
+        else
+        {
+            sifre.push_back(harf);
+            if (gizle)
+                cout << '*';
+        }
+    }
+    cout << endl;
+    return sifre;
+}
+
+// Surekli dosya okuma islemi yapmak yerine bu fonksiyon ile islem kolaylastirildi.
 void Kullanici::dosyaOku(string dosyaYolu, vector<string> list)
 {
     ifstream OkumaDosyasi(dosyaYolu);
@@ -423,7 +464,7 @@ void Kullanici::dosyaOku(string dosyaYolu, vector<string> list)
     OkumaDosyasi.close();
 }
 
-// Sifre degisimi icin
+// Sifre degisimi icin yardimci fonksiyon.
 void Kullanici::YeniSifreDosyaYaz(string dosyaYolu, vector<string> list, string yeniSifre)
 {
     ifstream KullanicilarDosya(dosyaYolu);
@@ -448,6 +489,7 @@ void Kullanici::YeniSifreDosyaYaz(string dosyaYolu, vector<string> list, string 
     }
     KullanicilarDosya.close();
 
+    // ofstream::out | ofstream::trunc ile dosya acilirken onceki veriler silinir.
     fstream KullanicilarDosya1(dosyaYolu, ofstream::out | ofstream::trunc);
 
     for (int i = 0; i < list.size(); i++)
@@ -479,9 +521,9 @@ void Kullanici::SifreDegistir()
     string yeniSifre;
 
 KONTROL:
-    // yeniSifre = sifrele("Yeni Sifrenizi Giriniz:", true);
-    cout << "Yeni Sifrenizi giriniz: ";
-    cin >> yeniSifre;
+    yeniSifre = SifreMaskeleme("Yeni Sifrenizi Giriniz:", true);
+    // cout << "Yeni Sifrenizi giriniz: ";
+    // cin >> yeniSifre;
 
     if (sifreKontrol(yeniSifre) == false)
     {
@@ -491,7 +533,7 @@ KONTROL:
 
     YeniSifreDosyaYaz("./kullanicilar.txt", list, yeniSifre);
 
-    system("clear");
+    system("CLS");
     cout << "Sifreniz Basariyla Degistirildi" << endl;
 
     setSifre(yeniSifre);
@@ -548,6 +590,7 @@ KONTROL:
         cout << "Kullanici Adi: ";
         getline(cin >> ws, kullaniciAdi);
 
+        // Kullanici adi musaitlik kontrolu.
         if (!(find(list.begin(), list.end(), kullaniciAdi) != list.end()))
         {
             if (kullaniciAdiKontrol(kullaniciAdi))
@@ -556,7 +599,7 @@ KONTROL:
             }
             else
             {
-                system("clear");
+                system("CLS");
                 cout << "Kullanici adi veya sifre geçersiz.\n";
                 goto KONTROL;
             }
@@ -567,9 +610,9 @@ KONTROL:
             goto KONTROL;
         }
 
-        // sifre = sifrele("Sifrenizi Giriniz", true);
-        cout << "Sifrenizi Giriniz: ";
-        cin >> sifre;
+        sifre = SifreMaskeleme("Sifrenizi Giriniz", true);
+        // cout << "Sifrenizi Giriniz: ";
+        // cin >> sifre;
 
         if (sifreKontrol(sifre))
         {
@@ -577,7 +620,7 @@ KONTROL:
         }
         else
         {
-            system("clear");
+            system("CLS");
             cout << "Sifre gecersiz. En az bir buyuk, bir kucuk, bir ozel harf ve minumum 8 karakterden olusmali\n";
             goto KONTROL;
         }
@@ -590,7 +633,7 @@ KONTROL:
         }
         else
         {
-            system("clear");
+            system("CLS");
             cout << "Eposta gecersiz.\n";
             goto KONTROL;
         }
@@ -609,11 +652,11 @@ KONTROL:
         }
         else
         {
-            system("clear");
+            system("CLS");
             cout << "Dogum Tarihini Uygun Formatta Giriniz...(GG/AA/YYYY)\n";
             goto KONTROL;
         }
-        system("clear");
+        system("CLS");
         cout << "Kayit Basarili" << endl;
 
         setAdSoyad(adSoyad);
@@ -670,6 +713,7 @@ bool Kullanici::sifreKontrol(string sifre)
 
             sayac = buyuk_harf + kucuk_harf + sayi + ozel_karakter;
 
+            // Istenen 4 sart saglanmadiysa bu if bloguna girer ve false dondurur.
             if (sayac < 4)
             {
                 return false;
@@ -771,6 +815,8 @@ void Yonetici::UrunEkle()
 
 void Kullanici::SiparisTakip()
 {
+    // Siparis takipte belli bir siparisi takip etmek yerine tum siparislerin durumu goruntulenir.\
+    // Gun bilgisi islenmediginden dolayi gece 12 civari verilen siparislerin takibi istenilen sonucu vermeyebilir.
     ifstream SiparislerDosya("./siparisler.txt");
 
     string Siparis;
@@ -794,7 +840,7 @@ void Kullanici::SiparisTakip()
             {
                 string tempSiparis = Siparis;
 
-                // Kullanici adi ve adres silme
+                // Bu menude kullanilmayacaklari icin kullanici adi ve adres satirdan silinir
                 tempSiparis.erase(0, tempSiparis.find(">") + 2);
 
                 string siparisBilgisiDosya = tempSiparis.substr(0, tempSiparis.find("<"));
@@ -821,6 +867,7 @@ void Kullanici::SiparisTakip()
                     varisZamaniString = "Teslimata " + to_string(varisZamani.getSaat() * 60 + varisZamani.getDakika()) + " Dakika kaldi.";
                 }
 
+                // Bilgiler formatli bir sekilde ekrana yazdirilir
                 cout << index << " - "
                      << "\n"
                      << "Siparis Bilgisi: " << siparisBilgisiDosya << "\n"
@@ -833,13 +880,19 @@ void Kullanici::SiparisTakip()
             }
         }
     }
-
+YANLIS_SECIM:
     cout << "Ana menuye donmek icin 1 e basiniz." << endl;
-    int secim;
-    cin >> secim;
-    if (secim == 1)
+    string Secim;
+    cin >> Secim;
+    char secim = charTanimla(Secim);
+    if (secim == '1')
     {
         cout << "Ana menuye donuluyor..." << endl;
+    }
+    else
+    {
+        cout << "Yanlis Secim" << endl;
+        goto   YANLIS_SECIM;
     }
 
     SiparislerDosya.close();
@@ -852,13 +905,14 @@ void Yonetici::KuryeEkle()
 
     int kuryeSayisi = 0;
 
-    string line;
+    string kurye;
 
-    while (getline(KuryelerDosyaOku, line))
+    while (getline(KuryelerDosyaOku, kurye))
     {
         kuryeSayisi++;
     }
 
+    // Yeni kuryeye id verilirken son kuryenin id sinin 1 fazlasi verilir
     int yeniKuryeId = kuryeSayisi + 1;
 
     string adSoyad;
@@ -914,6 +968,7 @@ KONTROL:
     cout << "Indirim kodu vermek istediginiz kullaniciyi giriniz: " << endl;
     cin >> kullaniciAdi;
 
+    // Kullanici adi listede varsa indirim kodu verilebilir
     if (find(list.begin(), list.end(), kullaniciAdi) != list.end())
     {
         cout << "Indirim kodunu giriniz: " << endl;
@@ -933,7 +988,7 @@ KONTROL:
     }
     else
     {
-        system("clear");
+        system("CLS");
         cout << "Gecersiz Kullanici Adi..." << endl;
         goto KONTROL;
     }
@@ -975,31 +1030,33 @@ void Yonetici::FaturaOku()
 void Menu::MenuBaslat()
 {
 ANA_MENU:
-    int opsiyon1, opsiyon2;
+    string opsiyon1, opsiyon2;
     cout << "1 - Sisteme giris\n2 - Uye kaydi\n3 - Cikis"
          << endl;
     cin >> opsiyon1;
-    system("clear");
+    char opsiyon3 = charTanimla(opsiyon1);
+    system("CLS");
 
-    switch (opsiyon1)
+    switch (opsiyon3)
     {
-    case 1:
+    case '1':
     {
     SISTEM_MENU:
         cout << "1 - Yonetici Girisi\n2 - Musteri Girisi\n"
              << endl;
 
         cin >> opsiyon2;
-        system("clear");
+        char opsiyon4 = charTanimla(opsiyon2);
+        system("CLS");
 
-        switch (opsiyon2)
+        switch (opsiyon4)
         {
-        case 1:
+        case '1':
         {
             YoneticiGiris();
             break;
         }
-        case 2:
+        case '2':
         {
             MusteriGiris();
             break;
@@ -1012,17 +1069,17 @@ ANA_MENU:
         }
         break;
     }
-    case 2:
+    case '2':
     {
         Kullanici user;
         user.KullaniciKaydet();
-        system("clear");
+        system("CLS");
         return MenuBaslat();
         break;
     }
-    case 3:
+    case '3':
     {
-        cout << "İyi günler dileriz...";
+        cout << "Iyi Gunler Dileriz.....";
         exit(1);
     }
     default:
@@ -1043,60 +1100,61 @@ void Menu::YoneticiGiris()
 
     cout << "Admin sifrenizi giriniz:" << endl;
     cin >> girilenSifre;
-    system("clear");
+    system("CLS");
     if (sifre == girilenSifre)
     {
     YONETICI_MENU:
         cout << "1 - Urun ekle\n2 - Kurye ekle\n3 - Sikayet ve Oneriler\n4 - Indirim kodu tanimla\n5 - Siparis Faturalari" << endl;
-        int AdminOpsiyon;
+        string AdminOpsiyon;
         cin >> AdminOpsiyon;
+        char adminOpsiyon = charTanimla(AdminOpsiyon);
 
-        switch (AdminOpsiyon)
+        switch (adminOpsiyon)
         {
-        case 1:
+        case '1':
         {
-            system("clear");
+            system("CLS");
             y.UrunEkle();
-            system("clear");
+            system("CLS");
             Menu m;
             m.MenuBaslat();
             break;
         }
-        case 2:
+        case '2':
         {
-            system("clear");
+            system("CLS");
             y.KuryeEkle();
-            system("clear");
+            system("CLS");
             Menu::MenuBaslat();
             break;
         }
-        case 3:
+        case '3':
         {
-            system("clear");
+            system("CLS");
             y.SikayetOku();
             Menu::MenuBaslat();
             break;
         }
-        case 4:
+        case '4':
         {
-            system("clear");
+            system("CLS");
             y.IndirimKoduEkle();
-            system("clear");
+            system("CLS");
 
             Menu::MenuBaslat();
             break;
         }
-        case 5:
+        case '5':
         {
-            system("clear");
+            system("CLS");
             y.FaturaOku();
 
-            /* Menu::MenuBaslat();*/
+            // Menu::MenuBaslat();
             break;
         }
         default:
         {
-            system("clear");
+            system("CLS");
             cout << "Hatali giris" << endl;
             goto YONETICI_MENU;
             break;
@@ -1119,9 +1177,9 @@ KULLANICI_GIRIS:
 
     cout << "Kullanici adi: ";
     cin >> username;
-    cout << "Sifrenizi giriniz: " << endl;
-    cin >> password;
-    // password = k.sifrele("Sifre:", true);
+    // cout << "Sifrenizi giriniz: " << endl;
+    // cin >> password;
+    password = k.SifreMaskeleme("Sifre:", true);
 
     if (KullanicilarDosya.is_open())
     {
@@ -1147,6 +1205,8 @@ KULLANICI_GIRIS:
 
             if (usernameFromFile == username && passwordFromFile == password)
             {
+                // Giris yapan kullanicinin tum bilgilerini setlenerek daha sonra siparis verme, takip etme sikayet veya oneri yazma
+                // gibi islemler icin kullanilabilir.
                 k.setKullaniciAdi(username);
                 k.setSifre(password);
                 k.setEposta(emailFromFile);
@@ -1161,7 +1221,7 @@ KULLANICI_GIRIS:
             }
             else
             {
-                system("clear");
+                system("CLS");
             }
         }
 
@@ -1176,7 +1236,7 @@ KULLANICI_GIRIS:
     }
 
 MUSTERI_MENU:
-    system("clear");
+    system("CLS");
 MENUM:
     cout << "1 - Kiyafet kategorileri ve Urun secimi\n"
          << "2 - Siparis takip\n"
@@ -1184,55 +1244,59 @@ MENUM:
          << "4 - Sifre Degistir\n"
          << "5 - Geri don\n"
          << endl;
-    int MusteriOpsiyon;
+    string MusteriOpsiyon;
     cin >> MusteriOpsiyon;
-
-    switch (MusteriOpsiyon)
+    char musteriOpsiyon = charTanimla(MusteriOpsiyon);
+    switch (musteriOpsiyon)
     {
-    case 1:
+    case '1':
     {
-        system("clear");
+        system("CLS");
+        // Kategiorileri listeleme her kategori sadece 1 kere listeye alinip gerceklestirilir
         SinglyLinkedList kategoriler = KategorileriListele();
+
+        // Normalde index secimi olarak yapmayi dusunduk
+        // Ancak kategorilerin isimlerini kullanicidan almayi tercih ettik.
         int kategoriSayisi = kategoriler.print();
 
         string kategoriSecimi;
         cout << "Kategori seciniz (Tum kategoriler icin 0 yaziniz): " << endl;
         getline(cin >> ws, kategoriSecimi);
 
-        system("clear");
+        system("CLS");
         UrunleriListele(kategoriSecimi, k);
         break;
     }
-    case 2:
+    case '2':
     {
-        system("clear");
+        system("CLS");
         k.SiparisTakip();
         goto MUSTERI_MENU;
         break;
     }
-    case 3:
+    case '3':
     {
-        system("clear");
+        system("CLS");
         k.SikayetYaz();
         goto MENUM;
         break;
     }
-    case 4:
+    case '4':
     {
-        system("clear");
+        system("CLS");
         k.SifreDegistir();
         goto MENUM;
         break;
     }
-    case 5:
+    case '5':
     {
-        system("clear");
+        system("CLS");
         MenuBaslat();
         break;
     }
     default:
     {
-        system("clear");
+        system("CLS");
         cout << "Hatali giris" << endl;
         goto MUSTERI_MENU;
         break;
@@ -1302,7 +1366,7 @@ void Menu::UrunleriListele(string Selection, Kullanici k)
 
         if (secilenUrunIndex > 0 && secilenUrunIndex <= index)
         {
-            system("clear");
+            system("CLS");
             UrunSec(*Urunler, secilenUrunIndex, k);
         }
         else
@@ -1319,6 +1383,7 @@ void Menu::UrunleriListele(string Selection, Kullanici k)
 
 void Menu::UrunSec(SinglyLinkedList &urunler, int urunIndex, Kullanici k)
 {
+// Programdaki en uzun fonksiyon, farkli fonksiyonlara ayrilip daha moduler hale getirilebilirdi.
 MENU:
     Zaman z;
     Kurye kurye;
@@ -1365,6 +1430,7 @@ MENU:
     beden.erase(0, beden.find("-") + 1);
     beden.erase(beden.find("-"), beden.find("\n"));
 
+    // Asagida beden ve renk mevcut mu degil mi kontrol ediliyor.
     while (!bedenKontrol)
     {
         cout << "Beden giriniz: " << endl;
@@ -1415,6 +1481,8 @@ MENU:
 
     double siparisFiyat = adet * fiyatDosyaSatirInt;
 
+    // Ilk eleman eklendiginde basina "," eklenmemesi lazim, ancak bu sorunu cozemedik.
+    // Bu yuzden siparisleri diger fonksiyonlarda ayirirken ">" karakterinden sonraki "," karakterini de silmesi saglaniyor.
     k.setSepet(k.getSepet() + "," + kiyafet.get_kategori() + "-" +
                kiyafet.get_kiyafet_adi() + "-" +
                to_string(kiyafet.get_fiyat()) + "-" +
@@ -1429,7 +1497,7 @@ MENU:
 DEVAM:
     cout << "Alisverise devam etmek ister misiniz? (e/h)" << endl;
     cin >> alisverisDevam;
-    system("clear");
+    system("CLS");
 
     if (alisverisDevam == "e")
     {
@@ -1440,11 +1508,12 @@ DEVAM:
         cout << "Kategori seciniz (Tum kategoriler icin 0 yaziniz): " << endl;
         getline(cin >> ws, categorySelection);
 
-        system("clear");
+        system("CLS");
         UrunleriListele(categorySelection, k);
     }
     else if (alisverisDevam == "h")
     {
+        // Siparis numarasini 7 basamakli rastgele bir sayi olarak atamayi tercih ettik.
         int siparisNo = rand() % 9999999 + 1000000;
 
         ifstream IndirimlerDosya("./indirimler.txt");
@@ -1453,6 +1522,8 @@ DEVAM:
         string IndirimKodu;
         string IndirimMiktari;
         int IndirimMiktariInt;
+
+        // Varsa kullaniciya tanimli indirim kodu yuzde olarak sepet tutarindan dusuruluyor.
         while (getline(IndirimlerDosya, Indirim))
         {
             if (Indirim.substr(0, Indirim.find(" ")) == k.getKullaniciAdi())
@@ -1472,6 +1543,7 @@ DEVAM:
             }
         }
 
+        // Tum bilgiler Siparis nesnesinde olusturulup SiparislerDosya ya ve FaturalarDosya ya yaziliyor.
         Siparis s(k.getKullaniciAdi(), k.getAdres(), ">" + k.getSepet() + "<", to_string(siparisNo), sepetTutari, z.getCurrentTime());
         s.set_siparis_ulasim(kurye.VarisZamaniHesapla(s, kurye.KuryeSec(s)));
 
@@ -1543,15 +1615,17 @@ bool Menu::Parcala(string str, string kullaniciGirisi)
 
 string Zaman::getCurrentDate()
 {
-    auto end = std::chrono::system_clock::now();
+    // Simdiki zamani chrono ve ctime kutuphaneleri ile aliyoruz.
+    auto end = chrono::system_clock::now();
 
-    std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+    std::time_t end_time = chrono::system_clock::to_time_t(end);
 
-    return std::ctime(&end_time);
+    return ctime(&end_time);
 }
 
 string Zaman::getCurrentTime()
 {
+    // getCurrentDate fonksiyonundan gelen string degeri manipule ederek sadece saat ve dakikayi aliyoruz.
     string time;
     string timeUnManipulated = getCurrentDate();
     timeUnManipulated.erase(0, timeUnManipulated.find(" ") + 1);
@@ -1642,6 +1716,7 @@ bool Zaman::operator<=(Zaman &obj)
 
 Zaman Zaman::stringToZaman(string zaman)
 {
+    // 09:30 gibi bir string degeri alip, saat ve dakikayi ayirip Zaman objesi olarak donduruyor.
     string Saat = zaman.substr(0, zaman.find(":"));
     zaman.erase(0, zaman.find(":") + 1);
     string Dakika = zaman.substr(0, zaman.find("\n"));
@@ -1684,6 +1759,7 @@ Zaman Zaman::stringToZaman(string zaman)
 
 Zaman Kurye::VarisZamani(Siparis s, string kuryeId)
 {
+    // Secilen kuryeye gore varis zamani hesapliyor.
     ifstream KonumlarDosya("./konumlar.txt");
     ifstream KuryelerDosya("./kuryeler.txt");
 
@@ -1776,40 +1852,6 @@ string Kurye::VarisZamaniHesapla(Siparis s, string kuryeId)
     return varisZamaniSaat + ":" + varisZamaniDakika;
 }
 
-void Kurye::KuryeAta(string varisZamani)
-{
-    ifstream KuryelerDosya("./kuryeler.txt");
-
-    string varisZamaniSaat = varisZamani.substr(0, varisZamani.find(":"));
-    varisZamani.erase(0, varisZamani.find(":") + 1);
-    string varisZamaniDakika = varisZamani.substr(0, varisZamani.find("\n"));
-
-    string kurye;
-
-    string ZamanDosya;
-    string SaatDosya;
-    string DakikaDosya;
-    string secilenKurye;
-    if (KuryelerDosya.is_open())
-    {
-        while (getline(KuryelerDosya, kurye))
-        {
-            kurye.erase(0, kurye.find("-") + 1);
-            kurye.erase(0, kurye.find("-") + 1);
-            ZamanDosya = kurye.substr(0, kurye.find("\n"));
-
-            SaatDosya = ZamanDosya.substr(0, ZamanDosya.find(":"));
-            ZamanDosya.erase(0, ZamanDosya.find(":") + 1);
-            DakikaDosya = ZamanDosya.substr(0, ZamanDosya.find("\n"));
-
-            if (SaatDosya <= varisZamaniSaat)
-            {
-                secilenKurye = kurye;
-            }
-        }
-    }
-}
-
 string Kurye::KuryeSec(Siparis s)
 {
     string siparisAlacakKuryeId;
@@ -1818,14 +1860,17 @@ string Kurye::KuryeSec(Siparis s)
     string bitmisKontrolId = BitmisKuryeKontrol();
     string ilkKuryeKontrol = IlkKuryeKontrol();
 
+    // Siparis bilgisi bos olan kurye varsa once ona atama yapiliyor.
     if (bosKontrolId != "bulunamadi")
     {
         siparisAlacakKuryeId = bosKontrolId;
     }
+    // Eger yoksa son siparisini teslim etmis kurye varsa o seciliyor.
     else if (bitmisKontrolId != "bulunamadi")
     {
         siparisAlacakKuryeId = bitmisKontrolId;
     }
+    // Bu iki kurye de yoksa elindeki siparisi en kisa surede teslim edebilecek kurye seciliyor.
     else
     {
         siparisAlacakKuryeId = ilkKuryeKontrol;
@@ -1983,5 +2028,6 @@ int main()
     srand(time(0));
 
     Menu m;
+
     m.MenuBaslat();
 }
